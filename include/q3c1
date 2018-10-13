@@ -1,6 +1,8 @@
 #ifndef Q3C1_H
 #define Q3C1_H
 
-#include "q3c1_bits/idx_set.hpp"
+#include "q3c1_bits/basis_func.hpp"
+#include "q3c1_bits/general.hpp"
+#include "q3c1_bits/vertex.hpp"
 
 #endif
