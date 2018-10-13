@@ -1,0 +1,6 @@
+#ifndef Q3C1_H
+#define Q3C1_H
+
+#include "q3c1_bits/idx_set.hpp"
+
+#endif
