@@ -28,9 +28,6 @@ namespace q3c1 {
 
 		_no_dims = abscissas.size();
 		_abscissas = abscissas;
-
-		_bf_val = nullptr;
-		_bf_deriv = nullptr;
 	};
 	Vertex::Vertex(const Vertex& other) : _global_idxs(other._global_idxs) {
 		_copy(other);
@@ -63,33 +60,21 @@ namespace q3c1 {
 	// Helpers
 	void Vertex::_clean_up()
 	{
-		if (_bf_val) { 
-			delete _bf_val; 
-			_bf_val = nullptr;
+		for (auto &bf: _bfs) {
+			if (bf) {
+				delete bf;
+				bf = nullptr;
+			};
 		};
-		if (_bf_deriv) { 
-			delete _bf_deriv; 
-			_bf_deriv = nullptr;
-		};
+		_bfs.clear();
 	};
 	void Vertex::_copy(const Vertex& other)
 	{
 		_no_dims = other._no_dims;
 		_abscissas = other._abscissas;
 		_cells = other._cells;
-		if (_no_dims == 1) {
-			// Try to cast
-			BasisFuncVal1D *bf_val_1d = dynamic_cast<BasisFuncVal1D*>(other._bf_val);
-			// If cast fails, returns null
-			if (bf_val_1d) {
-				// Copy
-				_bf_val = new BasisFuncVal1D(*bf_val_1d);
-			};
-
-			BasisFuncDeriv1D *bf_deriv_1d = dynamic_cast<BasisFuncDeriv1D*>(other._bf_deriv);
-			if (bf_deriv_1d) {
-				_bf_deriv = new BasisFuncDeriv1D(*bf_deriv_1d);
-			};
+		for (auto &bf: other._bfs) {
+			_bfs.push_back(new BasisFunc(*bf));
 		};
 	};
 	void Vertex::_move(Vertex& other)
@@ -97,23 +82,32 @@ namespace q3c1 {
 		_no_dims = other._no_dims;
 		_abscissas = other._abscissas;
 		_cells = other._cells;
-		_bf_val = other._bf_val;
-		_bf_deriv = other._bf_deriv;
+		_bfs = other._bfs;
 
 		// Reset other
 		other._no_dims = 0;
 		other._abscissas.clear();
 		other._cells.clear();
-		other._bf_val = nullptr;
-		other._bf_deriv = nullptr;
+		other._bfs.clear();
 	};
 
 	/********************
 	Location
 	********************/
 
+	int Vertex::get_no_dims() const {
+		return _no_dims;
+	};
+
+	int Vertex::get_global_idx(int dim) const {
+		return _global_idxs[dim];
+	};
 	IdxSet Vertex::get_global_idxs() const {
 		return _global_idxs;
+	};
+
+	double Vertex::get_abscissa(int dim) const {
+		return _abscissas[dim];
 	};
 	std::vector<double> Vertex::get_abscissas() const {
 		return _abscissas;
@@ -123,10 +117,7 @@ namespace q3c1 {
 	Basis funcs
 	********************/
 
-	BasisFuncVal* Vertex::get_bf_val() const {
-		return _bf_val;
-	};
-	BasisFuncDeriv* Vertex::get_bf_deriv() const {
-		return _bf_deriv;
+	const std::vector<BasisFunc*>& Vertex::get_bfs() const {
+		return _bfs;
 	};
 };

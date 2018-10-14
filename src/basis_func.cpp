@@ -19,7 +19,18 @@ namespace q3c1 {
 	****************************************/
 
 	// Constructors
-	BasisFunc::BasisFunc(Vertex* vertex) {
+	BasisFunc::BasisFunc(Vertex* vertex, std::vector<DimType> dim_types) {
+		if (!vertex) {
+			show_error("BasisFunc","BasisFunc","Vertex must not be nullptr");
+			exit(EXIT_FAILURE);
+		};
+		if (dim_types.size() != vertex->get_no_dims()) {
+			show_error("BasisFunc","BasisFunc","# Dim types do not match vertex dim");
+			exit(EXIT_FAILURE);
+		};
+
+		_no_dims = vertex->get_no_dims();
+		_dim_types = dim_types;
 		_vertex = vertex;
 		_coeff = 0.0;
 	};
@@ -55,17 +66,34 @@ namespace q3c1 {
 	};
 	void BasisFunc::_copy(const BasisFunc& other)
 	{
+		_no_dims = other._no_dims;
+		_dim_types = other._dim_types;
 		_vertex = new Vertex(*other._vertex);
 		_coeff = other._coeff;
 	};
 	void BasisFunc::_move(BasisFunc& other)
 	{
+		_no_dims = other._no_dims;
+		_dim_types = other._dim_types;
 		_vertex = other._vertex;
 		_coeff = other._coeff;
 
 		// Reset other
+		other._no_dims = 0;
+		other._dim_types.clear();
 		other._vertex = nullptr;
 		other._coeff = 0.0;
+	};
+
+	/********************
+	Dim types
+	********************/
+
+	DimType BasisFunc::get_dim_type(int dim) const {
+		return _dim_types[dim];
+	};
+	const std::vector<DimType>& BasisFunc::get_all_dim_types(int dim) const {
+		return _dim_types;
 	};
 
 	/********************
@@ -90,109 +118,93 @@ namespace q3c1 {
 		_coeff += inc;
 	};
 
+	/********************
+	Get val/deriv based on local idx
+	********************/
 
+	double BasisFunc::get_val(IdxSet local_idxs, std::vector<double> x_frac) const {
+		double val=1.0;
+		for (auto dim=0; dim<_no_dims; dim++) {
+			// safety check
+			/*
+			if (_dim_types[dim] != 0 && _dim_types[dim] != 1) {
+				show_error("BasisFunc","get_val","idx should be 0,1");
+				exit(EXIT_FAILURE);
+			};
+			*/
 
-	/****************************************
-	BasisFuncVal
-	--- ABSTRACT BASE ---	
-	****************************************/
-
-	BasisFuncVal::BasisFuncVal(Vertex* vertex) : BasisFunc(vertex) {};
-	BasisFuncVal::BasisFuncVal(const BasisFuncVal& other) : BasisFunc(other) {};
-	BasisFuncVal::BasisFuncVal(BasisFuncVal&& other) : BasisFunc(std::move(other)) {};
-	BasisFuncVal& BasisFuncVal::operator=(const BasisFuncVal &other) {
-		if (this != &other) {
-			BasisFunc::operator=(other);
+			if (_dim_types[dim] == DimType::VAL) {
+				// VAL
+				if (local_idxs[dim] == 0) {
+					val *= 1.0 - 3.0*pow(x_frac[dim],2) + 2.0*pow(x_frac[dim],3);
+				} else if (local_idxs[dim] == 1) {
+					val *= 3.0*pow(x_frac[dim],2) - 2.0*pow(x_frac[dim],3);
+				};
+			} else {
+				// DERIV
+				if (local_idxs[dim] == 0) {
+					val *= x_frac[dim] - 2.0*pow(x_frac[dim],2) + pow(x_frac[dim],3);
+				} else if (local_idxs[dim] == 1) {
+					val *= pow(x_frac[dim],3) - pow(x_frac[dim],2);
+				};
+			};
 		};
-		return *this;
+		return val;
 	};
-	BasisFuncVal& BasisFuncVal::operator=(BasisFuncVal &&other) {
-		if (this != &other) {
-			BasisFunc::operator=(std::move(other));
+
+	double BasisFunc::get_deriv(IdxSet local_idxs, std::vector<double> x_frac, std::vector<bool> deriv_dims) const {
+		double val=1.0;
+		for (auto dim=0; dim<_no_dims; dim++) {
+			// safety check
+			/*
+			if (_dim_types[dim] != 0 && _dim_types[dim] != 1) {
+				show_error("BasisFunc","get_val","idx should be 0,1");
+				exit(EXIT_FAILURE);
+			};
+			*/
+			if (!deriv_dims[dim]) {
+				// NO SPATIAL DERIV
+
+				if (_dim_types[dim] == DimType::VAL) {
+					// VAL
+					if (local_idxs[dim] == 0) {
+						val *= 1.0 - 3.0*pow(x_frac[dim],2) + 2.0*pow(x_frac[dim],3);
+					} else if (local_idxs[dim] == 1) {
+						val *= 3.0*pow(x_frac[dim],2) - 2.0*pow(x_frac[dim],3);
+					};
+				} else {
+					// DERIV
+					if (local_idxs[dim] == 0) {
+						val *= x_frac[dim] - 2.0*pow(x_frac[dim],2) + pow(x_frac[dim],3);
+					} else if (local_idxs[dim] == 1) {
+						val *= pow(x_frac[dim],3) - pow(x_frac[dim],2);
+					};
+				};
+
+			} else {
+
+
+				// SPATIAL DERIV
+
+
+				if (_dim_types[dim] == DimType::VAL) {
+					// VAL
+					if (local_idxs[dim] == 0) {
+						val *= - 6.0*x_frac[dim] + 6.0*pow(x_frac[dim],2);
+					} else if (local_idxs[dim] == 1) {
+						val *= 6.0*x_frac[dim] - 6.0*pow(x_frac[dim],2);
+					};
+				} else {
+					// DERIV
+					if (local_idxs[dim] == 0) {
+						val *= 1.0 - 4.0*x_frac[dim] + 3.0*pow(x_frac[dim],2);
+					} else if (local_idxs[dim] == 1) {
+						val *= 3.0*pow(x_frac[dim],2) - 2.0*x_frac[dim];
+					};
+				};
+			};
 		};
-		return *this;
+
+		return val;
 	};
-	BasisFuncVal::~BasisFuncVal() {
-		BasisFunc::~BasisFunc();
-	};
-
-
-
-	/****************************************
-	BasisFuncDeriv
-	--- ABSTRACT BASE ---	
-	****************************************/
-
-	BasisFuncDeriv::BasisFuncDeriv(Vertex* vertex) : BasisFunc(vertex) {};
-	BasisFuncDeriv::BasisFuncDeriv(const BasisFuncDeriv& other) : BasisFunc(other) {};
-	BasisFuncDeriv::BasisFuncDeriv(BasisFuncDeriv&& other) : BasisFunc(std::move(other)) {};
-	BasisFuncDeriv& BasisFuncDeriv::operator=(const BasisFuncDeriv &other) {
-		if (this != &other) {
-			BasisFunc::operator=(other);
-		};
-		return *this;
-	};
-	BasisFuncDeriv& BasisFuncDeriv::operator=(BasisFuncDeriv &&other) {
-		if (this != &other) {
-			BasisFunc::operator=(std::move(other));
-		};
-		return *this;
-	};
-	BasisFuncDeriv::~BasisFuncDeriv() {
-		BasisFunc::~BasisFunc();
-	};
-
-
-	/****************************************
-	BasisFuncVal1D
-	****************************************/
-
-	double BasisFuncVal1D::get_val(IdxSet local_idxs, double x_frac) {
-		if (local_idxs[0] == 0) {
-			return 1.0 - 3.0*pow(x_frac,2) + 2.0*pow(x_frac,3);
-		} else if (local_idxs[0] == 1) {
-			return 3.0*pow(x_frac,2) - 2.0*pow(x_frac,3);
-		} else {
-			show_error("BasisFuncVal1D","get_val","idx should be 0,1");
-			exit(EXIT_FAILURE);
-		};
-	};
-	double BasisFuncVal1D::get_deriv(IdxSet local_idxs, double x_frac) {
-		if (local_idxs[0] == 0) {
-			return - 6.0*x_frac + 6.0*pow(x_frac,2);
-		} else if (local_idxs[0] == 1) {
-			return 6.0*x_frac - 6.0*pow(x_frac,2);
-		} else {
-			show_error("BasisFuncVal1D","get_deriv","idx should be 0,1");
-			exit(EXIT_FAILURE);
-		};
-	};
-
-
-
-	/****************************************
-	BasisFuncDeriv1D
-	****************************************/
-
-	double BasisFuncDeriv1D::get_val(IdxSet local_idxs, double x_frac) {
-		if (local_idxs[0] == 0) {
-			return x_frac - 2.0*pow(x_frac,2) + pow(x_frac,3);
-		} else if (local_idxs[0] == 1) {
-			return pow(x_frac,3) - pow(x_frac,2);
-		} else {
-			show_error("BasisFuncDeriv1D","get_val","idx should be 0,1");
-			exit(EXIT_FAILURE);
-		};
-	};
-	double BasisFuncDeriv1D::get_deriv(IdxSet local_idxs, double x_frac) {
-		if (local_idxs[0] == 0) {
-			return 1.0 - 4.0*x_frac + 3.0*pow(x_frac,2);
-		} else if (local_idxs[0] == 1) {
-			return 3.0*pow(x_frac,2) - 2.0*x_frac;
-		} else {
-			show_error("BasisFuncDeriv1D","get_deriv","idx should be 0,1");
-			exit(EXIT_FAILURE);
-		};
-	};
-
 };

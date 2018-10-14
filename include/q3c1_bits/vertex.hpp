@@ -13,8 +13,7 @@ namespace q3c1 {
 
 	// Forwards
 	class Cell;
-	class BasisFuncVal;
-	class BasisFuncDeriv;
+	class BasisFunc;
 
 	/****************************************
 	Vertex
@@ -42,8 +41,7 @@ namespace q3c1 {
 		std::vector<Cell*> _cells;
 
 		// Basis funcs defined on this vertex
-		BasisFuncVal *_bf_val;
-		BasisFuncDeriv *_bf_deriv;
+		std::vector<BasisFunc*> _bfs;
 
 	public:
 
@@ -62,15 +60,19 @@ namespace q3c1 {
 		Location
 		********************/
 
+		int get_no_dims() const;
+
+		int get_global_idx(int dim) const;
 		IdxSet get_global_idxs() const;
+
+		double get_abscissa(int dim) const;
 		std::vector<double> get_abscissas() const;
 
 		/********************
 		Basis funcs
 		********************/
 
-		BasisFuncVal* get_bf_val() const;
-		BasisFuncDeriv* get_bf_deriv() const;
+		const std::vector<BasisFunc*>& get_bfs() const;
 	};
 };
 
