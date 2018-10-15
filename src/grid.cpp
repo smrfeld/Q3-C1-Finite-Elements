@@ -390,7 +390,7 @@ namespace q3c1 {
 
 		return val;
 	};
-	double Grid::get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) {
+	double Grid::get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) const {
 
 
 		// Get cell and fraction of this abscissa in the cell
@@ -414,7 +414,7 @@ namespace q3c1 {
 		return val;
 
 	};
-	double Grid::get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types) {
+	double Grid::get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types) const {
 
 		// Get cell and fraction of this abscissa in the cell
 		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
@@ -430,6 +430,76 @@ namespace q3c1 {
 
 		return bf->get_bf_val(idxs_local,pr.second);
 	};
+	std::map<Vertex*,std::vector<double>> Grid::get_deriv_wrt_coeffs_for_all_surrounding_verts(const std::vector<double>& abscissas) const {
+
+		// Get cell and fraction of this abscissa in the cell
+		std::pair<Cell*,std::vector<double>> pr_cell = get_cell(abscissas);
+
+		// Vals
+		std::vector<double> vals;
+		if (_no_dims == 1) {
+			vals = std::vector<double>({0,0});
+		} else if (_no_dims == 2) {
+			vals = std::vector<double>({0,0,0,0});
+		} else {
+			vals = std::vector<double>({0,0,0,0,0,0,0,0});
+		};
+
+		// Returned
+		std::map<Vertex*,std::vector<double>> ret;
+
+		// Go through all verts of the cell
+		if (_no_dims == 1) {
+			for (auto &pr_v: pr_cell.first->get_all_vertices()) {
+				// First are the local idxs; second is the vertex itself
+				// Val
+				vals[0] = pr_v.second->get_bf({DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second);
+				// Deriv
+				vals[1] = pr_v.second->get_bf({DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second);
+				// Append
+				ret[pr_v.second] = vals;
+			};
+		} else if (_no_dims == 2) {
+			for (auto &pr_v: pr_cell.first->get_all_vertices()) {
+				// First are the local idxs; second is the vertex itself
+				// Val-val
+				vals[0] = pr_v.second->get_bf({DimType::VAL,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second);
+				// Val-deriv
+				vals[1] = pr_v.second->get_bf({DimType::VAL,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second);
+				// Deriv-val
+				vals[2] = pr_v.second->get_bf({DimType::DERIV,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second);
+				// Deriv-deriv
+				vals[3] = pr_v.second->get_bf({DimType::DERIV,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second);
+				// Append
+				ret[pr_v.second] = vals;
+			};
+		} else if (_no_dims == 3) {
+			for (auto &pr_v: pr_cell.first->get_all_vertices()) {
+				// First are the local idxs; second is the vertex itself
+				// Val-val-val
+				vals[0] = pr_v.second->get_bf({DimType::VAL,DimType::VAL,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second);
+				// Val-val-deriv
+				vals[1] = pr_v.second->get_bf({DimType::VAL,DimType::VAL,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second);
+				// Val-deriv-val
+				vals[2] = pr_v.second->get_bf({DimType::VAL,DimType::DERIV,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second);
+				// Deriv-val-val
+				vals[3] = pr_v.second->get_bf({DimType::DERIV,DimType::VAL,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second);
+				// Val-deriv-deriv
+				vals[4] = pr_v.second->get_bf({DimType::VAL,DimType::DERIV,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second);
+				// Deriv-val-deriv
+				vals[5] = pr_v.second->get_bf({DimType::DERIV,DimType::VAL,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second);
+				// Deriv-deriv-val
+				vals[6] = pr_v.second->get_bf({DimType::DERIV,DimType::DERIV,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second);
+				// Deriv-deriv-deriv
+				vals[7] = pr_v.second->get_bf({DimType::DERIV,DimType::DERIV,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second);
+				// Append
+				ret[pr_v.second] = vals;
+			};
+		};	
+
+		return ret;
+	};
+
 
 	/********************
 	Read/write grid

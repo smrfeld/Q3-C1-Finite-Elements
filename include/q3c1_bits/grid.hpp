@@ -1,4 +1,5 @@
 #include <vector>
+#include <map>
 
 /************************************
 * Namespace for q3c1
@@ -87,8 +88,9 @@ namespace q3c1 {
 		********************/
 
 		double get_val(const std::vector<double>& abscissas) const;
-		double get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim);
-		double get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types);
+		double get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) const;
+		double get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types) const;
+		std::map<Vertex*,std::vector<double>> get_deriv_wrt_coeffs_for_all_surrounding_verts(const std::vector<double>& abscissas) const;
 
 		/********************
 		Read/write grid
