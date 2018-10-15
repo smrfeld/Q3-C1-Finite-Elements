@@ -60,7 +60,8 @@ namespace q3c1 {
 		Print
 		********************/
 
-		void print() const;
+		void print(const std::vector<DimType>& dim_types) const;
+		void print(Vertex* vert, const std::vector<DimType>& dim_types) const;
 
 		/********************
 		Get dims

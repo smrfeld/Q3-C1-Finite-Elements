@@ -292,8 +292,20 @@ namespace q3c1 {
 	Print
 	********************/
 
-	void Grid::print() const {
-		// ..
+	void Grid::print(const std::vector<DimType>& dim_types) const {
+		for (auto &vert: _verts) {
+			print(vert,dim_types);
+		};
+	};
+	void Grid::print(Vertex* vert, const std::vector<DimType>& dim_types) const {
+		if (_no_dims == 1) {
+			std::cout << vert->get_abscissa(0) << ": " << std::flush;
+		} else if (_no_dims == 2) {
+			std::cout << vert->get_abscissa(0) << " " << vert->get_abscissa(1) << ": "<< std::flush;
+		} else if (_no_dims == 3) {
+			std::cout << vert->get_abscissa(0) << " " << vert->get_abscissa(1) << " "<< vert->get_abscissa(2) << ": " << std::flush;
+		};
+		std::cout << vert->get_bf(dim_types)->get_coeff() << std::endl;
 	};
 
 	/********************
@@ -326,7 +338,13 @@ namespace q3c1 {
 
 			idx += term;
 		};
-		return _verts[idx];
+
+		if (idx < _verts.size()) {
+			return _verts[idx];
+		} else {
+			show_error("Grid","get_vertex","Idx out of bounds");
+			exit(EXIT_FAILURE);
+		};
 	};
 	
 	/********************
@@ -345,7 +363,12 @@ namespace q3c1 {
 
 			idx += term;
 		};
-		return _cells[idx];
+		if (idx < _cells.size()) {
+			return _cells[idx];
+		} else {
+			show_error("Grid","get_cell","Idx out of bounds");
+			exit(EXIT_FAILURE);
+		};
 	};
 
 	std::pair<Cell*,std::vector<double>> Grid::get_cell(const std::vector<double>& abscissas) const {
@@ -555,6 +578,9 @@ namespace q3c1 {
 				iss >> abscissa_str;
 				abscissa = atof(abscissa_str.c_str());
 				vertex_idxs[dim] = _dims[dim]->get_closest_idx(abscissa,true);
+				if (vertex_idxs[dim] == _dims[dim]->get_no_pts()) {
+					vertex_idxs[dim]--;
+				};
 			};
 
 			// Get vertex
