@@ -90,6 +90,18 @@ namespace q3c1 {
 		return _verts[idx].second;
 	};
 
+	IdxSet Cell::get_local_idxs_of_vertex(Vertex *vert) const {
+		for (auto &pr: _verts) {
+			if (pr.second == vert) {
+				return pr.first;
+			};
+		};
+
+		// Never get here
+		show_error("Cell","get_local_idxs_of_vertex","Could not find vertex");
+		exit(EXIT_FAILURE);
+	};
+
 	const std::vector<std::pair<IdxSet,Vertex*>>& Cell::get_all_vertices() const {
 		return _verts;
 	};

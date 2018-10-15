@@ -382,8 +382,7 @@ namespace q3c1 {
 		for (auto const &v_pr: pr.first->get_all_vertices()) {
 			// Run through all bfs defined on this vertex
 			for (auto const &bf: v_pr.second->get_bfs()) {
-				// val += bf->get_coeff() * bf->
-				val += bf->get_bf_val(v_pr.first, pr.second);
+				val += bf->get_coeff() * bf->get_bf_val(v_pr.first, pr.second);
 			};
 		};
 
@@ -406,18 +405,28 @@ namespace q3c1 {
 		for (auto const &v_pr: pr.first->get_all_vertices()) {
 			// Run through all bfs defined on this vertex
 			for (auto const &bf: v_pr.second->get_bfs()) {
-				// val += bf->get_coeff() * bf->
-				val += bf->get_bf_deriv(v_pr.first, pr.second, deriv_dim);
+				val += bf->get_coeff() * bf->get_bf_deriv(v_pr.first, pr.second, deriv_dim);
 			};
 		};
 
 		return val;
 
 	};
-	double Grid::get_deriv_wrt_coeff(const IdxSet& vertex_idxs, const std::vector<DimType>& dim_types) {
+	double Grid::get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& vertex_idxs, const std::vector<DimType>& dim_types) {
 
-		
-		
+		// Get cell and fraction of this abscissa in the cell
+		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
+
+		// Get the vertex
+		Vertex* vert = get_vertex(vertex_idxs);
+
+		// What is the local idx of this vert?
+		IdxSet idxs_local = pr.first->get_local_idxs_of_vertex(vert);
+
+		// Get the basis func
+		BasisFunc* bf = vert->get_bf(dim_types);
+
+		return bf->get_bf_val(idxs_local,pr.second);
 	};
 
 }

@@ -56,6 +56,7 @@ namespace q3c1 {
 		********************/
 
 		Vertex* get_vertex(IdxSet local_idxs) const;
+		IdxSet get_local_idxs_of_vertex(Vertex *vert) const;
 
 		const std::vector<std::pair<IdxSet,Vertex*>>& get_all_vertices() const;
 	};
