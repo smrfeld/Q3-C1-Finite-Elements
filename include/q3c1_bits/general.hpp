@@ -13,12 +13,6 @@ namespace q3c1 {
 	void show_error(std::string class_name, std::string func, std::string message);
 
 	/********************
-	Zero pad a string
-	********************/
-
-	std::string pad_str(int i, int n_zeros);
-	
-	/********************
 	Random numbers
 	********************/
 

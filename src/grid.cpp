@@ -242,7 +242,20 @@ namespace q3c1 {
 	// Helpers
 	void Grid::_clean_up()
 	{
-		// Nothing
+		for (auto &c: _cells) {
+			if (c) {
+				delete c;
+				c = nullptr;
+			};
+		};
+		_cells.clear();
+		for (auto &v: _verts) {
+			if (v) {
+				delete v;
+				v = nullptr;
+			};
+		};
+		_verts.clear();
 	};
 	void Grid::_copy(const Grid& other)
 	{
@@ -688,7 +701,7 @@ namespace q3c1 {
 				// Val-deriv-val
 				f << vert->get_bf({DimType::VAL,DimType::DERIV,DimType::VAL})->get_coeff() << " ";
 				// Deriv-val-val
-				f << vert->get_bf({DimType::DERIV,DimType::VAL,DimType::VAL})->get_coeff();
+				f << vert->get_bf({DimType::DERIV,DimType::VAL,DimType::VAL})->get_coeff() << " ";
 				// Val-deriv-deriv
 				f << vert->get_bf({DimType::VAL,DimType::DERIV,DimType::DERIV})->get_coeff() << " ";
 				// Deriv-val-deriv
