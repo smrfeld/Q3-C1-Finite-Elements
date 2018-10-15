@@ -14,6 +14,20 @@ int main() {
 	// Make a grid
 	Grid grid({&dim});
 
+	// Randomly populate
+	IdxSet idx(1);
+	std::vector<DimType> dim_types;
+	dim_types.push_back(DimType::VAL);
+	for (idx[0]=0; idx[0]<5; idx[0]++) {
+		dim_types[0] = DimType::VAL;
+		grid.get_vertex(idx)->get_bf(dim_types)->set_coeff(randD(-1.0,1.0));
+		dim_types[0] = DimType::DERIV;
+		grid.get_vertex(idx)->get_bf(dim_types)->set_coeff(randD(-1.0,1.0));
+	};
+
+	// Write grid
+	grid.write_to_file("test_1d.txt");
+
 	// Try a point
 	std::vector<double> pt;
 	pt.push_back(2.22);
