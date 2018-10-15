@@ -80,13 +80,14 @@ namespace q3c1 {
 		********************/
 
 		Cell* get_cell(IdxSet idxs) const;
+		std::pair<Cell*,std::vector<double>> get_cell(const std::vector<double>& abscissas) const;
 
 		/********************
 		Get vals
 		********************/
 
-		double get_val(const std::vector<double>& abscissa) const;
-		double get_deriv_wrt_abscissa(const std::vector<double>& abscissa, int deriv_dim);
+		double get_val(const std::vector<double>& abscissas) const;
+		double get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim);
 		double get_deriv_wrt_coeff(const IdxSet& idxs, const std::vector<DimType>& dim_types);
 
 	};

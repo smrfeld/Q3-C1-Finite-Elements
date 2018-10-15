@@ -4,6 +4,7 @@
 #include "../include/q3c1_bits/dimension_1d.hpp"
 #include "../include/q3c1_bits/cell.hpp"
 #include "../include/q3c1_bits/general.hpp"
+#include "../include/q3c1_bits/basis_func.hpp"
 
 /************************************
 * Namespace for q3c1
@@ -330,14 +331,62 @@ namespace q3c1 {
 		return _cells[idx];
 	};
 
+	std::pair<Cell*,std::vector<double>> Grid::get_cell(const std::vector<double>& abscissas) const {
+		std::vector<double> frac;
+		if (_no_dims == 1) {
+			IdxSet idxs(1);
+			idxs[0] = _dims[0]->get_idxs_surrounding_pt(abscissas[0]);
+			frac.push_back(_dims[0]->get_frac_between(abscissas[0],idxs[0]));
+			return std::make_pair(get_cell(idxs),frac);
+		} else if (_no_dims == 2) {
+			IdxSet idxs(2);
+			idxs[0] = _dims[0]->get_idxs_surrounding_pt(abscissas[0]);
+			idxs[1] = _dims[1]->get_idxs_surrounding_pt(abscissas[1]);
+			frac.push_back(_dims[0]->get_frac_between(abscissas[0],idxs[0]));
+			frac.push_back(_dims[1]->get_frac_between(abscissas[1],idxs[1]));
+			return std::make_pair(get_cell(idxs),frac);
+		} else if (_no_dims == 3) {
+			IdxSet idxs(3);
+			idxs[0] = _dims[0]->get_idxs_surrounding_pt(abscissas[0]);
+			idxs[1] = _dims[1]->get_idxs_surrounding_pt(abscissas[1]);
+			idxs[2] = _dims[2]->get_idxs_surrounding_pt(abscissas[2]);
+			frac.push_back(_dims[0]->get_frac_between(abscissas[0],idxs[0]));
+			frac.push_back(_dims[1]->get_frac_between(abscissas[1],idxs[1]));
+			frac.push_back(_dims[2]->get_frac_between(abscissas[2],idxs[2]));
+			return std::make_pair(get_cell(idxs),frac);
+		} else {
+			return std::make_pair(nullptr,frac);
+		};
+	};
+
+
 	/********************
 	Get vals
 	********************/
 
-	double Grid::get_val(const std::vector<double>& abscissa) const {
+	double Grid::get_val(const std::vector<double>& abscissas) const {
+		// Get cell and fraction of this abscissa in the cell
+		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
 
+		if (pr.first == nullptr) {
+			show_error("Grid","get_val","Cell not found");
+			exit(EXIT_FAILURE);
+		};
+
+		double val = 0.0;
+
+		// Run through all verts of the cell
+		for (auto const &v_pr: pr.first->get_all_vertices()) {
+			// Run through all bfs defined on this vertex
+			for (auto const &bf: v_pr.second->get_bfs()) {
+				// val += bf->get_coeff() * bf->
+				val += bf->get_bf_val(v_pr.first, pr.second);
+			};
+		};
+
+		return val;
 	};
-	double Grid::get_deriv_wrt_abscissa(const std::vector<double>& abscissa, int deriv_dim) {
+	double Grid::get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) {
 
 	};
 	double Grid::get_deriv_wrt_coeff(const IdxSet& idxs, const std::vector<DimType>& dim_types) {
