@@ -88,8 +88,14 @@ namespace q3c1 {
 
 		double get_val(const std::vector<double>& abscissas) const;
 		double get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim);
-		double get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& vertex_idxs, const std::vector<DimType>& dim_types);
+		double get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types);
 
+		/********************
+		Read/write grid
+		********************/
+
+		void read_from_file(std::string fname);
+		void write_to_file(std::string fname) const;
 	};
 };
 

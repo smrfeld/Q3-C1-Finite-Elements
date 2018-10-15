@@ -6,7 +6,9 @@
 #include "../include/q3c1_bits/general.hpp"
 #include "../include/q3c1_bits/basis_func.hpp"
 
+#include <fstream>
 #include <iostream>
+#include <sstream>
 
 /************************************
 * Namespace for q3c1
@@ -412,13 +414,13 @@ namespace q3c1 {
 		return val;
 
 	};
-	double Grid::get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& vertex_idxs, const std::vector<DimType>& dim_types) {
+	double Grid::get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types) {
 
 		// Get cell and fraction of this abscissa in the cell
 		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
 
 		// Get the vertex
-		Vertex* vert = get_vertex(vertex_idxs);
+		Vertex* vert = get_vertex(global_vertex_idxs);
 
 		// What is the local idx of this vert?
 		IdxSet idxs_local = pr.first->get_local_idxs_of_vertex(vert);
@@ -427,6 +429,209 @@ namespace q3c1 {
 		BasisFunc* bf = vert->get_bf(dim_types);
 
 		return bf->get_bf_val(idxs_local,pr.second);
+	};
+
+	/********************
+	Read/write grid
+	********************/
+
+	void Grid::read_from_file(std::string fname) {
+		std::ifstream f;
+
+		// Open
+		f.open(fname);
+
+		// Make sure we found it
+		if (!f.is_open()) {
+			show_error("Grid","read_from_file","Could not open file");
+			exit(EXIT_FAILURE);
+		};
+
+		// Abscissas
+		std::string abscissa_str;
+		double abscissa;
+		IdxSet vertex_idxs(_no_dims);
+		Vertex *vert;
+
+		// Ordinates
+		std::string ordinate_str="";
+		double ordinate;
+
+		// Read
+		std::string line;
+		std::istringstream iss;
+		while (getline(f,line)) {
+			// Skip empty lines
+			if (line == "") { continue; };
+			// Line
+			iss = std::istringstream(line);
+
+			// Abscissas
+			for (auto dim=0; dim<_no_dims; dim++) {
+				abscissa_str = "";
+				iss >> abscissa_str;
+				abscissa = atof(abscissa_str.c_str());
+				vertex_idxs[dim] = _dims[dim]->get_closest_idx(abscissa,true);
+			};
+
+			// Get vertex
+			vert = get_vertex(vertex_idxs);
+
+			// Ordinate
+			if (_no_dims == 1) {
+				// Val
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::VAL})->set_coeff(ordinate);
+
+				// Deriv
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::DERIV})->set_coeff(ordinate);
+			} else if (_no_dims == 2) {
+				// Val-val
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::VAL,DimType::VAL})->set_coeff(ordinate);
+
+				// Val-deriv
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::VAL,DimType::DERIV})->set_coeff(ordinate);
+
+				// Deriv-val
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::DERIV,DimType::VAL})->set_coeff(ordinate);
+
+				// Deriv-deriv
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::DERIV,DimType::DERIV})->set_coeff(ordinate);
+			} else if (_no_dims == 3) {
+				// Val-val-val
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::VAL,DimType::VAL,DimType::VAL})->set_coeff(ordinate);
+
+				// Val-val-deriv
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::VAL,DimType::VAL,DimType::DERIV})->set_coeff(ordinate);
+
+				// Val-deriv-val
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::VAL,DimType::DERIV,DimType::VAL})->set_coeff(ordinate);
+
+				// Deriv-val-val
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::DERIV,DimType::VAL,DimType::VAL})->set_coeff(ordinate);
+
+				// Val-deriv-deriv
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::VAL,DimType::DERIV,DimType::DERIV})->set_coeff(ordinate);
+
+				// Deriv-val-deriv
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::DERIV,DimType::VAL,DimType::DERIV})->set_coeff(ordinate);
+
+				// Deriv-deriv-val
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::DERIV,DimType::DERIV,DimType::VAL})->set_coeff(ordinate);
+
+				// Deriv-deriv-deriv
+				ordinate_str = "";
+				iss >> ordinate_str;
+				ordinate = atof(ordinate_str.c_str());
+				vert->get_bf({DimType::DERIV,DimType::DERIV,DimType::DERIV})->set_coeff(ordinate);
+			};			
+		};
+
+		// Close
+		f.close();
+	};
+	void Grid::write_to_file(std::string fname) const {
+		std::ofstream f;
+
+		// Open
+		f.open(fname);
+
+		// Make sure we found it
+		if (!f.is_open()) {
+			show_error("Grid","write_to_file","Could not open file");
+			exit(EXIT_FAILURE);
+		};
+
+		// Go through all grid pts
+		bool first_line=true;
+		for (auto &vert: _verts) {
+
+			if (!first_line) {
+				f << "\n";
+			} else {
+				first_line = false;
+			};
+
+			// Write abscissa
+			for (auto dim=0; dim<_no_dims; dim++) {
+				f << vert->get_abscissa(dim) << " ";
+			};
+
+			// Write vals for each bf
+			if (_no_dims == 1) {
+				// Val
+				f << vert->get_bf({DimType::VAL})->get_coeff() << " ";
+				// Deriv
+				f << vert->get_bf({DimType::DERIV})->get_coeff();
+			} else if (_no_dims == 2) {
+				// Val-val
+				f << vert->get_bf({DimType::VAL,DimType::VAL})->get_coeff() << " ";
+				// Val-deriv
+				f << vert->get_bf({DimType::VAL,DimType::DERIV})->get_coeff() << " ";
+				// Deriv-val
+				f << vert->get_bf({DimType::DERIV,DimType::VAL})->get_coeff() << " ";
+				// Deriv-deriv
+				f << vert->get_bf({DimType::DERIV,DimType::DERIV})->get_coeff();
+			} else if (_no_dims == 3) {
+				// Val-val-val
+				f << vert->get_bf({DimType::VAL,DimType::VAL,DimType::VAL})->get_coeff() << " ";
+				// Val-val-deriv
+				f << vert->get_bf({DimType::VAL,DimType::VAL,DimType::DERIV})->get_coeff() << " ";
+				// Val-deriv-val
+				f << vert->get_bf({DimType::VAL,DimType::DERIV,DimType::VAL})->get_coeff() << " ";
+				// Deriv-val-val
+				f << vert->get_bf({DimType::DERIV,DimType::VAL,DimType::VAL})->get_coeff();
+				// Val-deriv-deriv
+				f << vert->get_bf({DimType::VAL,DimType::DERIV,DimType::DERIV})->get_coeff() << " ";
+				// Deriv-val-deriv
+				f << vert->get_bf({DimType::DERIV,DimType::VAL,DimType::DERIV})->get_coeff() << " ";
+				// Deriv-deriv-val
+				f << vert->get_bf({DimType::DERIV,DimType::DERIV,DimType::VAL})->get_coeff() << " ";
+				// Deriv-deriv-deriv
+				f << vert->get_bf({DimType::DERIV,DimType::DERIV,DimType::DERIV})->get_coeff();
+			};		
+		};
+
+		// Close
+		f.close();
 	};
 
 }
