@@ -1,6 +1,11 @@
 #include <unordered_map>
 #include <vector>
 
+#ifndef IDX_SET_H
+#define IDX_SET_H
+#include "idx_set.hpp"
+#endif
+
 /************************************
 * Namespace for q3c1
 ************************************/
@@ -27,8 +32,11 @@ namespace q3c1 {
 		// No dims
 		int _no_dims;
 
+		// Idxs
+		IdxSet _idxs;
+
 		// Vertices
-		std::vector<std::pair<IdxSet,Vertex*>> _vertices;
+		std::vector<std::pair<IdxSet,Vertex*>> _verts;
 
 	public:
 
@@ -36,8 +44,7 @@ namespace q3c1 {
 		Constructor
 		********************/
 
-		Cell();
-		Cell(std::unordered_map<IdxSet,Vertex*> vertex_dic);
+		Cell(IdxSet idxs, std::vector<std::pair<IdxSet,Vertex*>>vert_dict);
 		Cell(const Cell& other);
 		Cell(Cell&& other);
 		Cell& operator=(const Cell &other);
@@ -47,8 +54,6 @@ namespace q3c1 {
 		/********************
 		Vertices
 		********************/
-
-		void add_vertex(IdxSet local_idxs, Vertex* vertex);
 
 		Vertex* get_vertex(IdxSet local_idxs) const;
 

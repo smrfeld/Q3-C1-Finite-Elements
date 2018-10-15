@@ -1,8 +1,8 @@
 /************************************
-* Namespace for dcu
+* Namespace for q3c1
 ************************************/
 
-namespace dcu {
+namespace q3c1 {
 
 	/****************************************
 	Dimension1D

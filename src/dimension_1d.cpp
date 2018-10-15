@@ -1,13 +1,13 @@
-#include "../include/dcubic_bits/dimension_1d.hpp"
+#include "../include/q3c1_bits/dimension_1d.hpp"
 
 #include <iostream>
 #include <cmath>
 
 /************************************
-* Namespace for dcu
+* Namespace for q3c1
 ************************************/
 
-namespace dcu {
+namespace q3c1 {
 
 	/****************************************
 	Dimension1D

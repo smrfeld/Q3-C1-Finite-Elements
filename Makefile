@@ -20,6 +20,7 @@ INSTALL_INCLUDE_DIR = /usr/local/include
 
 # source files
 SRC_NAMES = basis_func.cpp \
+	cell.cpp \
 	dimension_1d.cpp \
 	general.cpp \
 	idx_set.cpp \
