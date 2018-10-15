@@ -14,7 +14,8 @@ namespace q3c1 {
 	// Forwards
 	class Cell;
 	class BasisFunc;
-
+	enum class DimType: unsigned int;
+	
 	/****************************************
 	Vertex
 	****************************************/
@@ -73,6 +74,7 @@ namespace q3c1 {
 		********************/
 
 		const std::vector<BasisFunc*>& get_bfs() const;
+		BasisFunc* get_bf(const std::vector<DimType> &dim_types) const;
 	};
 };
 

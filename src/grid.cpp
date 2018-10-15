@@ -6,6 +6,8 @@
 #include "../include/q3c1_bits/general.hpp"
 #include "../include/q3c1_bits/basis_func.hpp"
 
+#include <iostream>
+
 /************************************
 * Namespace for q3c1
 ************************************/
@@ -365,6 +367,7 @@ namespace q3c1 {
 	********************/
 
 	double Grid::get_val(const std::vector<double>& abscissas) const {
+
 		// Get cell and fraction of this abscissa in the cell
 		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
 
@@ -388,9 +391,33 @@ namespace q3c1 {
 	};
 	double Grid::get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) {
 
-	};
-	double Grid::get_deriv_wrt_coeff(const IdxSet& idxs, const std::vector<DimType>& dim_types) {
 
+		// Get cell and fraction of this abscissa in the cell
+		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
+
+		if (pr.first == nullptr) {
+			show_error("Grid","get_val","Cell not found");
+			exit(EXIT_FAILURE);
+		};
+
+		double val = 0.0;
+
+		// Run through all verts of the cell
+		for (auto const &v_pr: pr.first->get_all_vertices()) {
+			// Run through all bfs defined on this vertex
+			for (auto const &bf: v_pr.second->get_bfs()) {
+				// val += bf->get_coeff() * bf->
+				val += bf->get_bf_deriv(v_pr.first, pr.second, deriv_dim);
+			};
+		};
+
+		return val;
+
+	};
+	double Grid::get_deriv_wrt_coeff(const IdxSet& vertex_idxs, const std::vector<DimType>& dim_types) {
+
+		
+		
 	};
 
 }

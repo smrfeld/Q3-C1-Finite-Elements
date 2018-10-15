@@ -55,7 +55,7 @@ namespace q3c1 {
 		********************/
 
 		DimType get_dim_type(int dim) const;
-		const std::vector<DimType>& get_all_dim_types(int dim) const;
+		const std::vector<DimType>& get_all_dim_types() const;
 
 		/********************
 		Vertex

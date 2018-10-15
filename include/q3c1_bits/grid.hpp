@@ -88,7 +88,7 @@ namespace q3c1 {
 
 		double get_val(const std::vector<double>& abscissas) const;
 		double get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim);
-		double get_deriv_wrt_coeff(const IdxSet& idxs, const std::vector<DimType>& dim_types);
+		double get_deriv_wrt_coeff(const IdxSet& vertex_idxs, const std::vector<DimType>& dim_types);
 
 	};
 };

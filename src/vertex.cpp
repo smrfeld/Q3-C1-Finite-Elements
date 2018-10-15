@@ -158,4 +158,13 @@ namespace q3c1 {
 	const std::vector<BasisFunc*>& Vertex::get_bfs() const {
 		return _bfs;
 	};
+	BasisFunc* Vertex::get_bf(const std::vector<DimType> &dim_types) const {
+		for (auto &bf: _bfs) {
+			if (bf->get_all_dim_types() == dim_types) {
+				return bf;
+			};
+		};
+
+		return nullptr;
+	};
 };

@@ -92,7 +92,7 @@ namespace q3c1 {
 	DimType BasisFunc::get_dim_type(int dim) const {
 		return _dim_types[dim];
 	};
-	const std::vector<DimType>& BasisFunc::get_all_dim_types(int dim) const {
+	const std::vector<DimType>& BasisFunc::get_all_dim_types() const {
 		return _dim_types;
 	};
 
@@ -163,7 +163,7 @@ namespace q3c1 {
 			};
 			*/
 			if (dim != deriv_dim) {
-				
+
 				// NO SPATIAL DERIV
 
 				if (_dim_types[dim] == DimType::VAL) {
