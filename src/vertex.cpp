@@ -159,12 +159,43 @@ namespace q3c1 {
 		return _bfs;
 	};
 	BasisFunc* Vertex::get_bf(const std::vector<DimType> &dim_types) const {
-		for (auto &bf: _bfs) {
-			if (bf->get_all_dim_types() == dim_types) {
-				return bf;
+		if (_no_dims == 0) {
+			if (dim_types[0] == DimType::VAL) {
+				return _bfs[0];
+			} else {
+				return _bfs[1];
 			};
+		} else if (_no_dims == 1) {
+			if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::VAL) {
+				return _bfs[0];
+			} else if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::DERIV) {
+				return _bfs[1];
+			} else if (dim_types[0] == DimType::DERIV && dim_types[1] == DimType::VAL) {
+				return _bfs[2];
+			} else {
+				return _bfs[3];
+			};
+		} else if (_no_dims == 2) {
+			if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::VAL && dim_types[2] == DimType::VAL) {
+				return _bfs[0];
+			} else if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::VAL && dim_types[2] == DimType::DERIV) {
+				return _bfs[1];
+			} else if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::DERIV && dim_types[2] == DimType::VAL) {
+				return _bfs[2];
+			} else if (dim_types[0] == DimType::DERIV && dim_types[1] == DimType::VAL && dim_types[2] == DimType::VAL) {
+				return _bfs[3];
+			} else if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::DERIV && dim_types[2] == DimType::DERIV) {
+				return _bfs[4];
+			} else if (dim_types[0] == DimType::DERIV && dim_types[1] == DimType::VAL && dim_types[2] == DimType::DERIV) {
+				return _bfs[5];
+			} else if (dim_types[0] == DimType::DERIV && dim_types[1] == DimType::DERIV && dim_types[2] == DimType::VAL) {
+				return _bfs[6];
+			} else {
+				return _bfs[7];
+			};		
+		} else {
+			show_error("Vertex","get_bf","only dims 1,2,3 supported");
+			exit(EXIT_FAILURE);
 		};
-
-		return nullptr;
 	};
 };
