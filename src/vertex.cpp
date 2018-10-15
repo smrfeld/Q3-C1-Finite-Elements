@@ -28,6 +28,44 @@ namespace q3c1 {
 
 		_no_dims = abscissas.size();
 		_abscissas = abscissas;
+
+
+		// Make bfs
+		if (_no_dims == 1) {
+			// Value
+			_bfs.push_back(new BasisFunc(this,{DimType::VAL}));
+			// Deriv
+			_bfs.push_back(new BasisFunc(this,{DimType::DERIV}));
+		} else if (_no_dims == 2) {
+			// Value-value
+			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::VAL}));
+			// Value-deriv
+			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::DERIV}));
+			// Deriv-value
+			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::VAL}));
+			// Deriv-deriv
+			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::DERIV}));
+		} else if (_no_dims == 3) {
+			// Value-value-value
+			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::VAL,DimType::VAL}));
+			// Value-value-deriv
+			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::VAL,DimType::DERIV}));
+			// Value-deriv-value
+			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::DERIV,DimType::VAL}));
+			// Deriv-value-value
+			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::VAL,DimType::VAL}));
+			// Value-deriv-deriv
+			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::DERIV,DimType::DERIV}));
+			// Deriv-value-deriv
+			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::VAL,DimType::DERIV}));
+			// Deriv-deriv-value
+			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::DERIV,DimType::VAL}));
+			// Deriv-deriv-deriv
+			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::DERIV,DimType::DERIV}));
+		} else {
+			show_error("Vertex","Vertex","only no dims 1,2,3 are supported");
+			exit(EXIT_FAILURE);
+		};
 	};
 	Vertex::Vertex(const Vertex& other) : _global_idxs(other._global_idxs) {
 		_copy(other);

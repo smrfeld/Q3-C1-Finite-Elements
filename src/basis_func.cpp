@@ -122,13 +122,13 @@ namespace q3c1 {
 	Get val/deriv based on local idx
 	********************/
 
-	double BasisFunc::get_val(IdxSet local_idxs, std::vector<double> x_frac) const {
+	double BasisFunc::get_bf_val(IdxSet local_idxs, std::vector<double> x_frac) const {
 		double val=1.0;
 		for (auto dim=0; dim<_no_dims; dim++) {
 			// safety check
 			/*
 			if (_dim_types[dim] != 0 && _dim_types[dim] != 1) {
-				show_error("BasisFunc","get_val","idx should be 0,1");
+				show_error("BasisFunc","get_bf_val","idx should be 0,1");
 				exit(EXIT_FAILURE);
 			};
 			*/
@@ -152,13 +152,13 @@ namespace q3c1 {
 		return val;
 	};
 
-	double BasisFunc::get_deriv(IdxSet local_idxs, std::vector<double> x_frac, std::vector<bool> deriv_dims) const {
+	double BasisFunc::get_bf_deriv(IdxSet local_idxs, std::vector<double> x_frac, std::vector<bool> deriv_dims) const {
 		double val=1.0;
 		for (auto dim=0; dim<_no_dims; dim++) {
 			// safety check
 			/*
 			if (_dim_types[dim] != 0 && _dim_types[dim] != 1) {
-				show_error("BasisFunc","get_val","idx should be 0,1");
+				show_error("BasisFunc","get_bf_val","idx should be 0,1");
 				exit(EXIT_FAILURE);
 			};
 			*/

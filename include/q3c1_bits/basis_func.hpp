@@ -75,8 +75,8 @@ namespace q3c1 {
 		Get val/deriv based on local idx
 		********************/
 	
-		double get_val(IdxSet local_idxs, std::vector<double> x_frac) const;
-		double get_deriv(IdxSet local_idxs, std::vector<double> x_frac, std::vector<bool> deriv_dims) const;
+		double get_bf_val(IdxSet local_idxs, std::vector<double> x_frac) const;
+		double get_bf_deriv(IdxSet local_idxs, std::vector<double> x_frac, std::vector<bool> deriv_dims) const;
 
 	};
 
