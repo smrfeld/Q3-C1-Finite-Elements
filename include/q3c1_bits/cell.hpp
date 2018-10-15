@@ -44,7 +44,7 @@ namespace q3c1 {
 		Constructor
 		********************/
 
-		Cell(IdxSet idxs, std::vector<std::pair<IdxSet,Vertex*>>vert_dict);
+		Cell(IdxSet idxs, std::vector<std::pair<IdxSet,Vertex*>>verts);
 		Cell(const Cell& other);
 		Cell(Cell&& other);
 		Cell& operator=(const Cell &other);

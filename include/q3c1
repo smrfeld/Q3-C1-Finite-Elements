@@ -5,6 +5,7 @@
 #include "q3c1_bits/cell.hpp"
 #include "q3c1_bits/dimension_1d.hpp"
 #include "q3c1_bits/general.hpp"
+#include "q3c1_bits/grid.hpp"
 #include "q3c1_bits/vertex.hpp"
 
 #endif

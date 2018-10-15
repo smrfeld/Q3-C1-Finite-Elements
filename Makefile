@@ -23,6 +23,7 @@ SRC_NAMES = basis_func.cpp \
 	cell.cpp \
 	dimension_1d.cpp \
 	general.cpp \
+	grid.cpp \
 	idx_set.cpp \
 	vertex.cpp
 SRCS = $(addprefix $(SOURCE_DIR)/, $(SRC_NAMES))
