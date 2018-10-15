@@ -19,10 +19,11 @@ INSTALL_LIB_DIR = /usr/local/lib
 INSTALL_INCLUDE_DIR = /usr/local/include
 
 # source files
-SRC_NAMES = idx_set.cpp \
-	vertex.cpp \
-	basis_func.cpp \
-	general.cpp
+SRC_NAMES = basis_func.cpp \
+	dimension_1d.cpp \
+	general.cpp \
+	idx_set.cpp \
+	vertex.cpp
 SRCS = $(addprefix $(SOURCE_DIR)/, $(SRC_NAMES))
 OBJS = $(addprefix $(BUILD_DIR)/, $(SRC_NAMES:.cpp=.o))
 DEPS = $(OBJS:.o=.d)
