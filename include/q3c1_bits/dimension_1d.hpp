@@ -38,21 +38,21 @@ namespace q3c1 {
 		double get_delta() const;
 
 		// Get by idx
-		double get_pt_by_idx(int idx, bool start_at_one=false) const;
+		double get_pt_by_idx(int idx) const;
 
 		// Check if point is in domain
 		bool check_if_pt_is_inside_domain(double x) const;
 
 		// Get closest index
-		int get_closest_idx(double x, bool start_at_one=false) const;
+		int get_closest_idx(double x) const;
 
 		// Get indexes surrounding a point
 		// ie point is between i and i+1 where i is returned
-		int get_idxs_surrounding_pt(double x, bool start_at_one=false) const; 
+		int get_idxs_surrounding_pt(double x) const; 
 
 		// Get fraction of a point between successive points
 		double get_frac_between(double x) const;
 		// Second optional specification: the return of the surrounding idxs
-		double get_frac_between(double x, int i, bool start_at_one=false) const;
+		double get_frac_between(double x, int i) const;
 	};
 };

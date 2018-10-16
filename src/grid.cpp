@@ -577,10 +577,7 @@ namespace q3c1 {
 				abscissa_str = "";
 				iss >> abscissa_str;
 				abscissa = atof(abscissa_str.c_str());
-				vertex_idxs[dim] = _dims[dim]->get_closest_idx(abscissa,true);
-				if (vertex_idxs[dim] == _dims[dim]->get_no_pts()) {
-					vertex_idxs[dim]--;
-				};
+				vertex_idxs[dim] = _dims[dim]->get_closest_idx(abscissa);
 			};
 
 			// Get vertex

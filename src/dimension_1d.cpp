@@ -78,12 +78,8 @@ namespace q3c1 {
 	};
 
 	// Get by idx
-	double Dimension1D::get_pt_by_idx(int idx, bool start_at_one) const {
-		if (start_at_one) {
-			return _min_pt + (idx-1) * _delta;
-		} else {
-			return _min_pt + idx * _delta;
-		};
+	double Dimension1D::get_pt_by_idx(int idx) const {
+		return _min_pt + idx * _delta;
 	};
 
 	// Check if point is in domain
@@ -96,9 +92,9 @@ namespace q3c1 {
 	};
 
 	// Get closest index
-	int Dimension1D::get_closest_idx(double x, bool start_at_one) const {
-		int i = get_idxs_surrounding_pt(x,start_at_one);
-		if (abs(x - get_pt_by_idx(i,start_at_one)) < abs(x - get_pt_by_idx(i+1,start_at_one))) {
+	int Dimension1D::get_closest_idx(double x) const {
+		int i = get_idxs_surrounding_pt(x);
+		if (abs(x - get_pt_by_idx(i)) < abs(x - get_pt_by_idx(i+1))) {
 			return i;
 		} else {
 			return i+1;
@@ -107,14 +103,10 @@ namespace q3c1 {
 
 	// Get indexes surrounding a point
 	// ie point is between i and i+1 where i is returned
-	int Dimension1D::get_idxs_surrounding_pt(double x, bool start_at_one) const {
+	int Dimension1D::get_idxs_surrounding_pt(double x) const {
 		int i = (x - _min_pt) / _delta;
 		if (i==_no_pts-1) {i--;};
-		if (start_at_one) {
-			return i+1;
-		} else {
-			return i;
-		};
+		return i;
 	};
 
 	// Get fraction of a point between successive points
@@ -122,7 +114,7 @@ namespace q3c1 {
 		return get_frac_between(x,get_idxs_surrounding_pt(x));
 	};
 	// Second optional specification: the return of the surrounding idxs
-	double Dimension1D::get_frac_between(double x, int i, bool start_at_one) const {
-		return (x - get_pt_by_idx(i,start_at_one)) / _delta;
+	double Dimension1D::get_frac_between(double x, int i) const {
+		return (x - get_pt_by_idx(i)) / _delta;
 	};
 };

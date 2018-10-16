@@ -159,13 +159,13 @@ namespace q3c1 {
 		return _bfs;
 	};
 	BasisFunc* Vertex::get_bf(const std::vector<DimType> &dim_types) const {
-		if (_no_dims == 0) {
+		if (_no_dims == 1) {
 			if (dim_types[0] == DimType::VAL) {
 				return _bfs[0];
 			} else {
 				return _bfs[1];
 			};
-		} else if (_no_dims == 1) {
+		} else if (_no_dims == 2) {
 			if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::VAL) {
 				return _bfs[0];
 			} else if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::DERIV) {
@@ -175,7 +175,7 @@ namespace q3c1 {
 			} else {
 				return _bfs[3];
 			};
-		} else if (_no_dims == 2) {
+		} else if (_no_dims == 3) {
 			if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::VAL && dim_types[2] == DimType::VAL) {
 				return _bfs[0];
 			} else if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::VAL && dim_types[2] == DimType::DERIV) {
