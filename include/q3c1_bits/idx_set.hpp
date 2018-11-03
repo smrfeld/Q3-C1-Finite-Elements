@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 
 /************************************
 * Namespace for q3c1

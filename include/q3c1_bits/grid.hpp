@@ -88,6 +88,7 @@ namespace q3c1 {
 		Get vals
 		********************/
 
+		bool check_in_domain(const std::vector<double>& abscissas) const;
 		double get_val(const std::vector<double>& abscissas) const;
 		double get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) const;
 		double get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types) const;
