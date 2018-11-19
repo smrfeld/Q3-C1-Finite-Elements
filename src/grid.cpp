@@ -347,6 +347,10 @@ namespace q3c1 {
 		};
 	};
 	
+	const std::vector<Vertex*>& Grid::get_all_vertices() const {
+		return _verts;
+	};
+
 	/********************
 	Get cell
 	********************/

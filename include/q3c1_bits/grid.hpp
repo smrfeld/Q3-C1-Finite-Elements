@@ -76,7 +76,8 @@ namespace q3c1 {
 		********************/
 
 		Vertex* get_vertex(IdxSet idxs) const;
-		
+		const std::vector<Vertex*>& get_all_vertices() const;
+
 		/********************
 		Get cell
 		********************/
