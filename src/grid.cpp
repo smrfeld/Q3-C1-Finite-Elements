@@ -108,7 +108,8 @@ namespace q3c1 {
 			abscissas[dim] = _dims[dim]->get_pt_by_idx(idxs[dim]);
 		};
 
-		_verts[idxs] = new Vertex(idxs, abscissas);
+		Vertex* vnew = new Vertex(idxs, abscissas);
+		_verts[idxs] = vnew;
 		return _verts[idxs];
 	};
 	Vertex* Grid::_get_or_make_vertex(IdxSet idxs) const {
@@ -249,7 +250,7 @@ namespace q3c1 {
 
 		// Make
 		_cells[idxs] = new Cell(idxs, verts_local);
-		return _cells[idxs];
+		return _cells[idxs];	
 	};
 
 	/********************
@@ -344,13 +345,9 @@ namespace q3c1 {
 		// Get cell and fraction of this abscissa in the cell
 		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
 
-		if (pr.first == nullptr) {
-			show_error("Grid","get_val","Cell not found");
-			exit(EXIT_FAILURE);
-		};
-
 		double val = 0.0;
 
+		int idx=0;
 		// Run through all verts of the cell
 		for (auto const &v_pr: pr.first->get_all_vertices()) {
 			// Run through all bfs defined on this vertex
@@ -363,14 +360,8 @@ namespace q3c1 {
 	};
 	double Grid::get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) const {
 
-
 		// Get cell and fraction of this abscissa in the cell
 		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
-
-		if (pr.first == nullptr) {
-			show_error("Grid","get_val","Cell not found");
-			exit(EXIT_FAILURE);
-		};
 
 		double val = 0.0;
 

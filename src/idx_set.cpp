@@ -126,9 +126,15 @@ namespace q3c1 {
     bool operator<(const IdxSet &lhs, const IdxSet &rhs) {
     	for (auto i=0; i<lhs.size(); i++) {
     		if (lhs[i] < rhs[i]) {
+    			// Less than in this element => lhs comes first
     			return true;
+    		} else if (lhs[i] > rhs[i]) {
+    			// Greater than in this element => rhs comes first
+    			return false;
     		};
+    		// If we get here, they are equal in this element; go another level
     	};
+    	// If we get here, they are equal in all elements
     	return false;
     };
 
