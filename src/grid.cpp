@@ -22,197 +22,13 @@ namespace q3c1 {
 
 	// Constructors
 	Grid::Grid(std::vector<Dimension1D*> dims) {
-		if (dims.size() > 3 || dims.size() == 0) {
-			show_error("Grid","Grid","Only dimensions 1,2,3 supported");
+		if (dims.size() > 3 || dims.size() < 1) {
+			std::cerr << ">>> Grid::Grid <<< Error: only 1,2,3 dims supported" << std::endl;
 			exit(EXIT_FAILURE);
 		};
 
 		_no_dims = dims.size();
 		_dims = dims;
-		for (auto const &dim: dims) {
-			_no_verts_in_each_dim.push_back(dim->get_no_pts());
-			_no_cells_in_each_dim.push_back(dim->get_no_pts()-1);
-		};
-
-		// Make all the verts, cells
-		std::vector<double> abscissas;
-		std::vector<std::pair<IdxSet,Vertex*>> verts_local;
-		if (_no_dims == 1) {
-			// Dim = 1
-
-			// Verts
-			IdxSet idxs(1);
-			abscissas.push_back(0.0);
-			for (idxs[0]=0; idxs[0]<_dims[0]->get_no_pts(); idxs[0]++) {
-				abscissas[0] = _dims[0]->get_pt_by_idx(idxs[0]);
-				_verts.push_back(new Vertex(idxs, abscissas));
-			};
-
-			// Cells
-			IdxSet idxs_local(1);
-			IdxSet idxs_find(1);
-			for (idxs[0]=0; idxs[0]<_dims[0]->get_no_pts()-1; idxs[0]++) {
-
-				// Surrounding verts
-				verts_local.clear();
-				idxs_find = idxs;
-
-				idxs_find[0] = idxs[0];
-				idxs_local[0] = 0;
-				verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-				idxs_find[0] = idxs[0]+1;
-				idxs_local[0] = 1;
-				verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-
-				// Make
-				_cells.push_back(new Cell(idxs, verts_local));
-			};
-
-
-		} else if (_no_dims == 2) {
-			// Dim = 2
-
-			// Verts
-			IdxSet idxs(2);
-			abscissas.push_back(0.0);
-			abscissas.push_back(0.0);
-			for (idxs[0]=0; idxs[0]<_dims[0]->get_no_pts(); idxs[0]++) {
-				for (idxs[1]=0; idxs[1]<_dims[1]->get_no_pts(); idxs[1]++) {
-					abscissas[0] = _dims[0]->get_pt_by_idx(idxs[0]);
-					abscissas[1] = _dims[1]->get_pt_by_idx(idxs[1]);
-					_verts.push_back(new Vertex(idxs, abscissas));
-				};
-			};
-
-			// Cells
-			IdxSet idxs_local(2);
-			IdxSet idxs_find(2);
-			for (idxs[0]=0; idxs[0]<_dims[0]->get_no_pts()-1; idxs[0]++) {
-				for (idxs[1]=0; idxs[1]<_dims[1]->get_no_pts()-1; idxs[1]++) {
-
-					// Surrounding verts
-					verts_local.clear();
-					idxs_find = idxs;
-
-					idxs_find[0] = idxs[0];
-					idxs_find[1] = idxs[1];
-					idxs_local[0] = 0;
-					idxs_local[1] = 0;
-					verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-					idxs_find[0] = idxs[0]+1;
-					idxs_find[1] = idxs[1];
-					idxs_local[0] = 1;
-					idxs_local[1] = 0;
-					verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-					idxs_find[0] = idxs[0];
-					idxs_find[1] = idxs[1]+1;
-					idxs_local[0] = 0;
-					idxs_local[1] = 1;
-					verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-					idxs_find[0] = idxs[0]+1;
-					idxs_find[1] = idxs[1]+1;
-					idxs_local[0] = 1;
-					idxs_local[1] = 1;
-					verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-
-					// Make
-					_cells.push_back(new Cell(idxs, verts_local));
-				};
-			};
-
-		} else if (_no_dims == 3) {
-			// Dim = 3
-
-			// Verts
-			IdxSet idxs(3);
-			abscissas.push_back(0.0);
-			abscissas.push_back(0.0);
-			abscissas.push_back(0.0);
-			for (idxs[0]=0; idxs[0]<_dims[0]->get_no_pts(); idxs[0]++) {
-				for (idxs[1]=0; idxs[1]<_dims[1]->get_no_pts(); idxs[1]++) {
-					for (idxs[2]=0; idxs[2]<_dims[2]->get_no_pts(); idxs[2]++) {
-						abscissas[0] = _dims[0]->get_pt_by_idx(idxs[0]);
-						abscissas[1] = _dims[1]->get_pt_by_idx(idxs[1]);
-						abscissas[2] = _dims[2]->get_pt_by_idx(idxs[2]);
-						_verts.push_back(new Vertex(idxs, abscissas));
-					};
-				};
-			};
-
-			// Cells
-			IdxSet idxs_local(3);
-			IdxSet idxs_find(3);
-			for (idxs[0]=0; idxs[0]<_dims[0]->get_no_pts()-1; idxs[0]++) {
-				for (idxs[1]=0; idxs[1]<_dims[1]->get_no_pts()-1; idxs[1]++) {
-					for (idxs[2]=0; idxs[2]<_dims[2]->get_no_pts()-1; idxs[2]++) {
-
-						// Surrounding verts
-						verts_local.clear();
-						idxs_find = idxs;
-
-						idxs_find[0] = idxs[0];
-						idxs_find[1] = idxs[1];
-						idxs_find[2] = idxs[2];
-						idxs_local[0] = 0;
-						idxs_local[1] = 0;
-						idxs_local[2] = 0;
-						verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-						idxs_find[0] = idxs[0]+1;
-						idxs_find[1] = idxs[1];
-						idxs_find[2] = idxs[2];
-						idxs_local[0] = 1;
-						idxs_local[1] = 0;
-						idxs_local[2] = 0;
-						verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-						idxs_find[0] = idxs[0];
-						idxs_find[1] = idxs[1]+1;
-						idxs_find[2] = idxs[2];
-						idxs_local[0] = 0;
-						idxs_local[1] = 1;
-						idxs_local[2] = 0;
-						verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-						idxs_find[0] = idxs[0];
-						idxs_find[1] = idxs[1];
-						idxs_find[2] = idxs[2]+1;
-						idxs_local[0] = 0;
-						idxs_local[1] = 0;
-						idxs_local[2] = 1;
-						verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-						idxs_find[0] = idxs[0]+1;
-						idxs_find[1] = idxs[1]+1;
-						idxs_find[2] = idxs[2];
-						idxs_local[0] = 1;
-						idxs_local[1] = 1;
-						idxs_local[2] = 0;
-						verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-						idxs_find[0] = idxs[0]+1;
-						idxs_find[1] = idxs[1];
-						idxs_find[2] = idxs[2]+1;
-						idxs_local[0] = 1;
-						idxs_local[1] = 0;
-						idxs_local[2] = 1;
-						verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-						idxs_find[0] = idxs[0];
-						idxs_find[1] = idxs[1]+1;
-						idxs_find[2] = idxs[2]+1;
-						idxs_local[0] = 0;
-						idxs_local[1] = 1;
-						idxs_local[2] = 1;
-						verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-						idxs_find[0] = idxs[0]+1;
-						idxs_find[1] = idxs[1]+1;
-						idxs_find[2] = idxs[2]+1;
-						idxs_local[0] = 1;
-						idxs_local[1] = 1;
-						idxs_local[2] = 1;
-						verts_local.push_back(std::make_pair(idxs_local,get_vertex(idxs_find)));
-
-						// Make
-						_cells.push_back(new Cell(idxs, verts_local));
-					};
-				};
-			};
-		};
 	};
 	Grid::Grid(const Grid& other) {
 		_copy(other);
@@ -243,16 +59,16 @@ namespace q3c1 {
 	void Grid::_clean_up()
 	{
 		for (auto &c: _cells) {
-			if (c) {
-				delete c;
-				c = nullptr;
+			if (c.second) {
+				delete c.second;
+				_cells[c.first] = nullptr;
 			};
 		};
 		_cells.clear();
 		for (auto &v: _verts) {
-			if (v) {
-				delete v;
-				v = nullptr;
+			if (v.second) {
+				delete v.second;
+				_verts[v.first] = nullptr;
 			};
 		};
 		_verts.clear();
@@ -261,31 +77,179 @@ namespace q3c1 {
 	{
 		_no_dims = other._no_dims;
 		_dims = other._dims;
-		_no_verts_in_each_dim = other._no_verts_in_each_dim;
-		_no_cells_in_each_dim = other._no_cells_in_each_dim;
 		for (auto &v: other._verts) {
-			_verts.push_back(new Vertex(*v));
+			_verts[v.first] = new Vertex(*v.second);
 		};
 		for (auto &c: other._cells) {
-			_cells.push_back(new Cell(*c));
+			_cells[c.first] = new Cell(*c.second);
 		};
 	};
 	void Grid::_move(Grid& other)
 	{
 		_no_dims = other._no_dims;
 		_dims = other._dims;
-		_no_verts_in_each_dim = other._no_verts_in_each_dim;
-		_no_cells_in_each_dim = other._no_cells_in_each_dim;
 		_verts = other._verts;
 		_cells = other._cells;
 
 		// Reset other
 		other._no_dims = 0;
 		other._dims.clear();
-		other._no_verts_in_each_dim.clear();
-		other._no_cells_in_each_dim.clear();
 		other._verts.clear();
 		other._cells.clear();
+	};
+
+	/********************
+	Make a cell
+	********************/
+
+	Vertex* Grid::_make_vertex(IdxSet idxs) const {		
+		std::vector<double> abscissas(_no_dims);
+		for (auto dim=0; dim<_no_dims; dim++) {
+			abscissas[dim] = _dims[dim]->get_pt_by_idx(idxs[dim]);
+		};
+
+		_verts[idxs] = new Vertex(idxs, abscissas);
+		return _verts[idxs];
+	};
+	Vertex* Grid::_get_or_make_vertex(IdxSet idxs) const {
+		// Similar to the get_vertex function, but this one either gives the vertex or directly makes it (no cell)
+		auto it = _verts.find(idxs);
+		if (it != _verts.end()) {
+			return it->second;
+		} else {
+			return _make_vertex(idxs);
+		};
+	};
+
+	Cell* Grid::_make_cell(IdxSet idxs) const {
+
+		std::cout << "Making cell: " << idxs << std::endl;
+
+		// Collect needed verts
+		IdxSet idxs_vert(_no_dims), idxs_local(_no_dims);
+		std::vector<std::pair<IdxSet,Vertex*>> verts_local;
+
+		// Go through all dims
+		if (_no_dims == 1) {
+
+			// 0
+			idxs_local[0] = 0;
+			idxs_vert[0] = idxs[0];
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 1
+			idxs_local[0] = 1;
+			idxs_vert[0] = idxs[0]+1;
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+		} else if (_no_dims == 2) {
+
+			// 0,0
+			idxs_local[0] = 0;
+			idxs_local[1] = 0;
+			idxs_vert[0] = idxs[0];
+			idxs_vert[1] = idxs[1];
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 0,1
+			idxs_local[0] = 0;
+			idxs_local[1] = 1;
+			idxs_vert[0] = idxs[0];
+			idxs_vert[1] = idxs[1]+1;
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 1,0
+			idxs_local[0] = 1;
+			idxs_local[1] = 0;
+			idxs_vert[0] = idxs[0]+1;
+			idxs_vert[1] = idxs[1];
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 1,1
+			idxs_local[0] = 1;
+			idxs_local[1] = 1;
+			idxs_vert[0] = idxs[0]+1;
+			idxs_vert[1] = idxs[1]+1;
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+		} else if (_no_dims == 3) {
+
+			// 0,0,0
+			idxs_local[0] = 0;
+			idxs_local[1] = 0;
+			idxs_local[2] = 0;
+			idxs_vert[0] = idxs[0];
+			idxs_vert[1] = idxs[1];
+			idxs_vert[2] = idxs[2];
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 0,0,1
+			idxs_local[0] = 0;
+			idxs_local[1] = 0;
+			idxs_local[2] = 1;
+			idxs_vert[0] = idxs[0];
+			idxs_vert[1] = idxs[1];
+			idxs_vert[2] = idxs[2]+1;
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 0,1,0
+			idxs_local[0] = 0;
+			idxs_local[1] = 1;
+			idxs_local[2] = 0;
+			idxs_vert[0] = idxs[0];
+			idxs_vert[1] = idxs[1]+1;
+			idxs_vert[2] = idxs[2];
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 1,0,0
+			idxs_local[0] = 1;
+			idxs_local[1] = 0;
+			idxs_local[2] = 0;
+			idxs_vert[0] = idxs[0]+1;
+			idxs_vert[1] = idxs[1];
+			idxs_vert[2] = idxs[2];
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 0,1,1
+			idxs_local[0] = 0;
+			idxs_local[1] = 1;
+			idxs_local[2] = 1;
+			idxs_vert[0] = idxs[0];
+			idxs_vert[1] = idxs[1]+1;
+			idxs_vert[2] = idxs[2]+1;
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 1,0,1
+			idxs_local[0] = 1;
+			idxs_local[1] = 0;
+			idxs_local[2] = 1;
+			idxs_vert[0] = idxs[0]+1;
+			idxs_vert[1] = idxs[1];
+			idxs_vert[2] = idxs[2]+1;
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 1,1,0
+			idxs_local[0] = 1;
+			idxs_local[1] = 1;
+			idxs_local[2] = 0;
+			idxs_vert[0] = idxs[0]+1;
+			idxs_vert[1] = idxs[1]+1;
+			idxs_vert[2] = idxs[2];
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+
+			// 1,1,1
+			idxs_local[0] = 1;
+			idxs_local[1] = 1;
+			idxs_local[2] = 1;
+			idxs_vert[0] = idxs[0]+1;
+			idxs_vert[1] = idxs[1]+1;
+			idxs_vert[2] = idxs[2]+1;
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));			
+		};
+
+		// Make
+		_cells[idxs] = new Cell(idxs, verts_local);
+		return _cells[idxs];
 	};
 
 	/********************
@@ -294,7 +258,7 @@ namespace q3c1 {
 
 	void Grid::print(const std::vector<DimType>& dim_types) const {
 		for (auto &vert: _verts) {
-			print(vert,dim_types);
+			print(vert.second,dim_types);
 		};
 	};
 	void Grid::print(Vertex* vert, const std::vector<DimType>& dim_types) const {
@@ -327,27 +291,20 @@ namespace q3c1 {
 	********************/
 
 	Vertex* Grid::get_vertex(IdxSet idxs) const {
-		int idx=0;
-		int term;
-		for (auto dim=0; dim<_no_dims; dim++) {
-			
-			term = idxs[dim];
-			for (auto dim2=dim+1; dim2<_no_dims; dim2++) {
-				term *= _no_verts_in_each_dim[dim2];
-			};
-
-			idx += term;
-		};
-
-		if (idx < _verts.size()) {
-			return _verts[idx];
+		auto it = _verts.find(idxs);
+		if (it != _verts.end()) {
+			return it->second;
 		} else {
-			show_error("Grid","get_vertex","Idx out of bounds");
-			exit(EXIT_FAILURE);
+			// Vertices should not exist without cells
+			// Cell at this idx does not exist b/c vertex does not exist
+			// Call make cell will make vertex!
+			_make_cell(idxs);
+			// Now it must exist; try again!
+			return get_vertex(idxs);
 		};
 	};
-	
-	const std::vector<Vertex*>& Grid::get_all_vertices() const {
+
+	const std::map<IdxSet,Vertex*>& Grid::get_all_vertices() const {
 		return _verts;
 	};
 
@@ -356,67 +313,31 @@ namespace q3c1 {
 	********************/
 
 	Cell* Grid::get_cell(IdxSet idxs) const {
-		int idx=0;
-		int term;
-		for (auto dim=0; dim<_no_dims; dim++) {
-			
-			term = idxs[dim];
-			for (auto dim2=dim+1; dim2<_no_dims; dim2++) {
-				term *= _no_cells_in_each_dim[dim2];
-			};
-
-			idx += term;
-		};
-		if (idx < _cells.size()) {
-			return _cells[idx];
+		auto it = _cells.find(idxs);
+		if (it != _cells.end()) {
+			return it->second;
 		} else {
-			show_error("Grid","get_cell","Idx out of bounds");
-			exit(EXIT_FAILURE);
+			return _make_cell(idxs);
 		};
 	};
 
 	std::pair<Cell*,std::vector<double>> Grid::get_cell(const std::vector<double>& abscissas) const {
 		std::vector<double> frac;
-		if (_no_dims == 1) {
-			IdxSet idxs(1);
-			idxs[0] = _dims[0]->get_idxs_surrounding_pt(abscissas[0]);
-			frac.push_back(_dims[0]->get_frac_between(abscissas[0],idxs[0]));
-			return std::make_pair(get_cell(idxs),frac);
-		} else if (_no_dims == 2) {
-			IdxSet idxs(2);
-			idxs[0] = _dims[0]->get_idxs_surrounding_pt(abscissas[0]);
-			idxs[1] = _dims[1]->get_idxs_surrounding_pt(abscissas[1]);
-			frac.push_back(_dims[0]->get_frac_between(abscissas[0],idxs[0]));
-			frac.push_back(_dims[1]->get_frac_between(abscissas[1],idxs[1]));
-			return std::make_pair(get_cell(idxs),frac);
-		} else if (_no_dims == 3) {
-			IdxSet idxs(3);
-			idxs[0] = _dims[0]->get_idxs_surrounding_pt(abscissas[0]);
-			idxs[1] = _dims[1]->get_idxs_surrounding_pt(abscissas[1]);
-			idxs[2] = _dims[2]->get_idxs_surrounding_pt(abscissas[2]);
-			frac.push_back(_dims[0]->get_frac_between(abscissas[0],idxs[0]));
-			frac.push_back(_dims[1]->get_frac_between(abscissas[1],idxs[1]));
-			frac.push_back(_dims[2]->get_frac_between(abscissas[2],idxs[2]));
-			return std::make_pair(get_cell(idxs),frac);
-		} else {
-			return std::make_pair(nullptr,frac);
+		IdxSet idxs(_no_dims);
+		for (auto dim=0; dim<_no_dims; dim++) {
+			idxs[dim] = _dims[dim]->get_idxs_surrounding_pt(abscissas[dim]);
+			frac.push_back(_dims[dim]->get_frac_between(abscissas[dim],idxs[dim]));
 		};
+		return std::make_pair(get_cell(idxs),frac);
 	};
 
+	const std::map<IdxSet,Cell*>& Grid::get_all_cells() const {
+		return _cells;
+	};
 
 	/********************
 	Get vals
 	********************/
-
-	bool Grid::check_in_domain(const std::vector<double>& abscissas) const {
-		for (auto i=0; i<abscissas.size(); i++) {
-			if (!_dims[i]->check_if_pt_is_inside_domain(abscissas[i])) {
-				std::cout << "Warning: " << abscissas[i] << " is outside of domain of dim #: " << i << std::endl;
-				return false;
-			};
-		};
-		return true;
-	};
 
 	double Grid::get_val(const std::vector<double>& abscissas) const {
 
@@ -696,41 +617,41 @@ namespace q3c1 {
 
 			// Write abscissa
 			for (auto dim=0; dim<_no_dims; dim++) {
-				f << vert->get_abscissa(dim) << " ";
+				f << vert.second->get_abscissa(dim) << " ";
 			};
 
 			// Write vals for each bf
 			if (_no_dims == 1) {
 				// Val
-				f << vert->get_bf({DimType::VAL})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::VAL})->get_coeff() << " ";
 				// Deriv
-				f << vert->get_bf({DimType::DERIV})->get_coeff();
+				f << vert.second->get_bf({DimType::DERIV})->get_coeff();
 			} else if (_no_dims == 2) {
 				// Val-val
-				f << vert->get_bf({DimType::VAL,DimType::VAL})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::VAL,DimType::VAL})->get_coeff() << " ";
 				// Val-deriv
-				f << vert->get_bf({DimType::VAL,DimType::DERIV})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::VAL,DimType::DERIV})->get_coeff() << " ";
 				// Deriv-val
-				f << vert->get_bf({DimType::DERIV,DimType::VAL})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::DERIV,DimType::VAL})->get_coeff() << " ";
 				// Deriv-deriv
-				f << vert->get_bf({DimType::DERIV,DimType::DERIV})->get_coeff();
+				f << vert.second->get_bf({DimType::DERIV,DimType::DERIV})->get_coeff();
 			} else if (_no_dims == 3) {
 				// Val-val-val
-				f << vert->get_bf({DimType::VAL,DimType::VAL,DimType::VAL})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::VAL,DimType::VAL,DimType::VAL})->get_coeff() << " ";
 				// Val-val-deriv
-				f << vert->get_bf({DimType::VAL,DimType::VAL,DimType::DERIV})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::VAL,DimType::VAL,DimType::DERIV})->get_coeff() << " ";
 				// Val-deriv-val
-				f << vert->get_bf({DimType::VAL,DimType::DERIV,DimType::VAL})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::VAL,DimType::DERIV,DimType::VAL})->get_coeff() << " ";
 				// Deriv-val-val
-				f << vert->get_bf({DimType::DERIV,DimType::VAL,DimType::VAL})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::DERIV,DimType::VAL,DimType::VAL})->get_coeff() << " ";
 				// Val-deriv-deriv
-				f << vert->get_bf({DimType::VAL,DimType::DERIV,DimType::DERIV})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::VAL,DimType::DERIV,DimType::DERIV})->get_coeff() << " ";
 				// Deriv-val-deriv
-				f << vert->get_bf({DimType::DERIV,DimType::VAL,DimType::DERIV})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::DERIV,DimType::VAL,DimType::DERIV})->get_coeff() << " ";
 				// Deriv-deriv-val
-				f << vert->get_bf({DimType::DERIV,DimType::DERIV,DimType::VAL})->get_coeff() << " ";
+				f << vert.second->get_bf({DimType::DERIV,DimType::DERIV,DimType::VAL})->get_coeff() << " ";
 				// Deriv-deriv-deriv
-				f << vert->get_bf({DimType::DERIV,DimType::DERIV,DimType::DERIV})->get_coeff();
+				f << vert.second->get_bf({DimType::DERIV,DimType::DERIV,DimType::DERIV})->get_coeff();
 			};		
 		};
 

@@ -33,15 +33,16 @@ namespace q3c1 {
 		// Dimensions
 		std::vector<Dimension1D*> _dims;
 
-		// No x in each dim
-		std::vector<int> _no_verts_in_each_dim;
-		std::vector<int> _no_cells_in_each_dim;
-
 		// Vertices
-		std::vector<Vertex*> _verts;
+		mutable std::map<IdxSet,Vertex*> _verts;
 
 		// Grids
-		std::vector<Cell*> _cells;
+		mutable std::map<IdxSet,Cell*> _cells;
+
+		// Make a cell/vertex (presumes that the cell does NOT exist!)
+		Vertex* _make_vertex(IdxSet idxs) const;
+		Vertex* _get_or_make_vertex(IdxSet idxs) const;
+		Cell* _make_cell(IdxSet idxs) const;
 
 	public:
 
@@ -75,21 +76,23 @@ namespace q3c1 {
 		Get vertices
 		********************/
 
+		// Will make the vertex if needed!
 		Vertex* get_vertex(IdxSet idxs) const;
-		const std::vector<Vertex*>& get_all_vertices() const;
+		const std::map<IdxSet,Vertex*>& get_all_vertices() const;
 
 		/********************
 		Get cell
 		********************/
 
+		// Will make the cell if needed!
 		Cell* get_cell(IdxSet idxs) const;
 		std::pair<Cell*,std::vector<double>> get_cell(const std::vector<double>& abscissas) const;
+		const std::map<IdxSet,Cell*>& get_all_cells() const;
 
 		/********************
 		Get vals
 		********************/
 
-		bool check_in_domain(const std::vector<double>& abscissas) const;
 		double get_val(const std::vector<double>& abscissas) const;
 		double get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) const;
 		double get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types) const;

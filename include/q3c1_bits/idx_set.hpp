@@ -58,6 +58,7 @@ namespace q3c1 {
 
     // Comparator
     bool operator==(const IdxSet &lhs, const IdxSet &rhs);
+    bool operator<(const IdxSet &lhs, const IdxSet &rhs);
 
     // Math
     IdxSet operator+(IdxSet lhs, const IdxSet& rhs);

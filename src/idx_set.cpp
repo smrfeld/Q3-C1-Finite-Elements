@@ -123,6 +123,14 @@ namespace q3c1 {
     	};
     	return true;
     };
+    bool operator<(const IdxSet &lhs, const IdxSet &rhs) {
+    	for (auto i=0; i<lhs.size(); i++) {
+    		if (lhs[i] < rhs[i]) {
+    			return true;
+    		};
+    	};
+    	return false;
+    };
 
 	// Math
     IdxSet operator+(IdxSet lhs, const IdxSet& rhs) {

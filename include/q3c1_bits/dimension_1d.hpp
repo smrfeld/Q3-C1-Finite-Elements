@@ -12,19 +12,17 @@ namespace q3c1 {
 
 	private:
 
-		double _min_pt;
-		double _max_pt;
 		double _delta;
-		int _no_pts;
+		double _zero;
 
 		// Internal copy func/clean up
 		void _clean_up();
-		void _reset();
+		void _move(Dimension1D& other);
 		void _copy(const Dimension1D& other);
 
 	public:
 
-		Dimension1D(double min_pt_pt, double max_pt_pt, int no_pts);
+		Dimension1D(double delta, double zero);
 		Dimension1D(const Dimension1D& other);
 		Dimension1D(Dimension1D&& other);
 		Dimension1D& operator=(const Dimension1D& other);
@@ -32,16 +30,11 @@ namespace q3c1 {
 		~Dimension1D();
 
 		// Accessors
-		int get_no_pts() const;
-		double get_min_pt() const;
-		double get_max_pt() const;
 		double get_delta() const;
+		double get_zero() const;
 
 		// Get by idx
 		double get_pt_by_idx(int idx) const;
-
-		// Check if point is in domain
-		bool check_if_pt_is_inside_domain(double x) const;
 
 		// Get closest index
 		int get_closest_idx(double x) const;
