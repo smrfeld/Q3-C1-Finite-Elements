@@ -124,7 +124,7 @@ namespace q3c1 {
 
 	Cell* Grid::_make_cell(IdxSet idxs) const {
 
-		std::cout << "Making cell: " << idxs << std::endl;
+		// std::cout << "Making cell: " << idxs << std::endl;
 
 		// Collect needed verts
 		IdxSet idxs_vert(_no_dims), idxs_local(_no_dims);

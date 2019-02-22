@@ -32,7 +32,10 @@ namespace q3c1 {
 		_no_dims = vertex->get_no_dims();
 		_dim_types = dim_types;
 		_vertex = vertex;
+		// Init to zero
 		_coeff = 0.0;
+		// Init to random
+		// _coeff = randD(-5.0,5.0);
 	};
 	BasisFunc::BasisFunc(const BasisFunc& other) {
 		_copy(other);
