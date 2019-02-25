@@ -37,6 +37,9 @@ namespace q3c1 {
 		// Coeff
 		double _coeff;
 
+        // Fixed vals?
+        bool _are_vals_fixed;
+
 	public:
 
 		/********************
@@ -71,6 +74,13 @@ namespace q3c1 {
 		void set_coeff(double val);
 		void increment_coeff(double inc);
 
+        // ***************
+        // MARK: - Fix vals
+        // ***************
+        
+        void set_is_val_fixed(bool fixed);
+        bool get_is_val_fixed() const;
+        
 		/********************
 		Get val/deriv based on local idx
 		********************/

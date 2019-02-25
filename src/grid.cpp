@@ -347,7 +347,6 @@ namespace q3c1 {
 
 		double val = 0.0;
 
-		int idx=0;
 		// Run through all verts of the cell
 		for (auto const &v_pr: pr.first->get_all_vertices()) {
 			// Run through all bfs defined on this vertex

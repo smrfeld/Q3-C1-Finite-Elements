@@ -43,7 +43,7 @@ namespace q3c1 {
 
 		// Basis funcs defined on this vertex
 		std::vector<BasisFunc*> _bfs;
-
+        
 	public:
 
 		/********************
@@ -68,7 +68,7 @@ namespace q3c1 {
 
 		double get_abscissa(int dim) const;
 		std::vector<double> get_abscissas() const;
-
+        
 		/********************
 		Basis funcs
 		********************/

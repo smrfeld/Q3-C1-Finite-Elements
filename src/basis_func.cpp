@@ -36,6 +36,7 @@ namespace q3c1 {
 		_coeff = 0.0;
 		// Init to random
 		// _coeff = randD(-5.0,5.0);
+        _are_vals_fixed = false;
 	};
 	BasisFunc::BasisFunc(const BasisFunc& other) {
 		_copy(other);
@@ -73,6 +74,7 @@ namespace q3c1 {
 		_dim_types = other._dim_types;
 		_vertex = new Vertex(*other._vertex);
 		_coeff = other._coeff;
+        _are_vals_fixed = other._are_vals_fixed;
 	};
 	void BasisFunc::_move(BasisFunc& other)
 	{
@@ -80,12 +82,14 @@ namespace q3c1 {
 		_dim_types = other._dim_types;
 		_vertex = other._vertex;
 		_coeff = other._coeff;
+        _are_vals_fixed = other._are_vals_fixed;
 
 		// Reset other
 		other._no_dims = 0;
 		other._dim_types.clear();
 		other._vertex = nullptr;
 		other._coeff = 0.0;
+        other._are_vals_fixed = false;
 	};
 
 	/********************
@@ -115,12 +119,28 @@ namespace q3c1 {
 		return _coeff;
 	};
 	void BasisFunc::set_coeff(double val) {
-		_coeff = val;
+        if (!_are_vals_fixed) {
+            _coeff = val;
+        };
 	};
 	void BasisFunc::increment_coeff(double inc) {
-		_coeff += inc;
+        if (!_are_vals_fixed) {
+            _coeff += inc;
+        };
 	};
 
+    // ***************
+    // MARK: - Fix vals
+    // ***************
+    
+    void BasisFunc::set_is_val_fixed(bool fixed) {
+        _are_vals_fixed = fixed;
+    };
+    
+    bool BasisFunc::get_is_val_fixed() const {
+        return _are_vals_fixed;
+    };
+    
 	/********************
 	Get val/deriv based on local idx
 	********************/
