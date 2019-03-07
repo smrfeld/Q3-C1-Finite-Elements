@@ -585,6 +585,7 @@ namespace q3c1 {
 	};
 	void Grid::write_to_file(std::string fname) const {
 		std::ofstream f;
+        f.precision(16);
 
 		// Open
 		f.open(fname);
