@@ -108,6 +108,8 @@ namespace q3c1 {
 			abscissas[dim] = _dims[dim]->get_pt_by_idx(idxs[dim]);
 		};
 
+        // std::cout << "Making vertex: " << abscissas[0] << " " << abscissas[1] << " " << abscissas[2] << std::endl;
+        
 		Vertex* vnew = new Vertex(idxs, abscissas);
 		_verts[idxs] = vnew;
 		return _verts[idxs];
@@ -245,8 +247,15 @@ namespace q3c1 {
 			idxs_vert[0] = idxs[0]+1;
 			idxs_vert[1] = idxs[1]+1;
 			idxs_vert[2] = idxs[2]+1;
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));			
-		};
+			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+            
+            /*
+            std::cout << "   Verts:" << std::endl;
+            for (auto i=0; i<8; i++) {
+                std::cout << "   " << verts_local[i].second->get_abscissa(0) << " " << verts_local[i].second->get_abscissa(1) << " " << verts_local[i].second->get_abscissa(2) << std::endl;
+            };
+             */
+        };
 
 		// Make
 		_cells[idxs] = new Cell(idxs, verts_local);
@@ -314,6 +323,7 @@ namespace q3c1 {
 	********************/
 
 	Cell* Grid::get_cell(IdxSet idxs) const {
+        // std::cout << "Get cell: " << idxs << std::endl;
 		auto it = _cells.find(idxs);
 		if (it != _cells.end()) {
 			return it->second;
@@ -323,12 +333,14 @@ namespace q3c1 {
 	};
 
 	std::pair<Cell*,std::vector<double>> Grid::get_cell(const std::vector<double>& abscissas) const {
+        // std::cout << "Get cell: " << abscissas[0] << " " << abscissas[1] << " " << abscissas[2] << std::endl;
 		std::vector<double> frac;
 		IdxSet idxs(_no_dims);
 		for (auto dim=0; dim<_no_dims; dim++) {
 			idxs[dim] = _dims[dim]->get_idxs_surrounding_pt(abscissas[dim]);
 			frac.push_back(_dims[dim]->get_frac_between(abscissas[dim],idxs[dim]));
 		};
+        // std::cout << "Surrounding idxs: " << idxs << std::endl;
 		return std::make_pair(get_cell(idxs),frac);
 	};
 

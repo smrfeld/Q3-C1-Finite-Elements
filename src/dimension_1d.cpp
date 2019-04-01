@@ -84,7 +84,13 @@ namespace q3c1 {
 	// Get indexes surrounding a point
 	// ie point is between i and i+1 where i is returned
 	int Dimension1D::get_idxs_surrounding_pt(double x) const {
+        // std::cout << x << " minus " << _zero << " over " << _delta;
 		int i = (x - _zero) / _delta;
+        // std::cout << " is " << i;
+        if (x < _zero) {
+            i -= 1;
+            // std::cout << " fix to " << i << std::endl;
+        };
 		return i;
 	};
 
