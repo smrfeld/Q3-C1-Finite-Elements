@@ -31,38 +31,74 @@ namespace q3c1 {
 
 
 		// Make bfs
+        std::vector<DimType> dim_types_possible({DimType::VAL,DimType::DERIV});
 		if (_no_dims == 1) {
-			// Value
-			_bfs.push_back(new BasisFunc(this,{DimType::VAL}));
-			// Deriv
-			_bfs.push_back(new BasisFunc(this,{DimType::DERIV}));
+            
+            for (auto const &dim0: dim_types_possible) {
+                _bfs.push_back(new BasisFunc(this,{dim0}));
+            };
+            
 		} else if (_no_dims == 2) {
-			// Value-value
-			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::VAL}));
-			// Value-deriv
-			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::DERIV}));
-			// Deriv-value
-			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::VAL}));
-			// Deriv-deriv
-			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::DERIV}));
-		} else if (_no_dims == 3) {
-			// Value-value-value
-			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::VAL,DimType::VAL}));
-			// Value-value-deriv
-			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::VAL,DimType::DERIV}));
-			// Value-deriv-value
-			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::DERIV,DimType::VAL}));
-			// Deriv-value-value
-			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::VAL,DimType::VAL}));
-			// Value-deriv-deriv
-			_bfs.push_back(new BasisFunc(this,{DimType::VAL,DimType::DERIV,DimType::DERIV}));
-			// Deriv-value-deriv
-			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::VAL,DimType::DERIV}));
-			// Deriv-deriv-value
-			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::DERIV,DimType::VAL}));
-			// Deriv-deriv-deriv
-			_bfs.push_back(new BasisFunc(this,{DimType::DERIV,DimType::DERIV,DimType::DERIV}));
-		} else {
+
+            for (auto const &dim0: dim_types_possible) {
+                for (auto const &dim1: dim_types_possible) {
+                    _bfs.push_back(new BasisFunc(this,{dim0,dim1}));
+                };
+            };
+
+        } else if (_no_dims == 3) {
+
+            for (auto const &dim0: dim_types_possible) {
+                for (auto const &dim1: dim_types_possible) {
+                    for (auto const &dim2: dim_types_possible) {
+                        _bfs.push_back(new BasisFunc(this,{dim0,dim1,dim2}));
+                    };
+                };
+            };
+
+        } else if (_no_dims == 4) {
+            
+            for (auto const &dim0: dim_types_possible) {
+                for (auto const &dim1: dim_types_possible) {
+                    for (auto const &dim2: dim_types_possible) {
+                        for (auto const &dim3: dim_types_possible) {
+                            _bfs.push_back(new BasisFunc(this,{dim0,dim1,dim2,dim3}));
+                        };
+                    };
+                };
+            };
+            
+        } else if (_no_dims == 5) {
+            
+            for (auto const &dim0: dim_types_possible) {
+                for (auto const &dim1: dim_types_possible) {
+                    for (auto const &dim2: dim_types_possible) {
+                        for (auto const &dim3: dim_types_possible) {
+                            for (auto const &dim4: dim_types_possible) {
+                                _bfs.push_back(new BasisFunc(this,{dim0,dim1,dim2,dim3,dim4}));
+                            };
+                        };
+                    };
+                };
+            };
+            
+        } else if (_no_dims == 6) {
+            
+            for (auto const &dim0: dim_types_possible) {
+                for (auto const &dim1: dim_types_possible) {
+                    for (auto const &dim2: dim_types_possible) {
+                        for (auto const &dim3: dim_types_possible) {
+                            for (auto const &dim4: dim_types_possible) {
+                                for (auto const &dim5: dim_types_possible) {
+                                    _bfs.push_back(new BasisFunc(this,{dim0,dim1,dim2,dim3,dim4,dim5}));
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+
+        } else {
 			show_error("Vertex","Vertex","only no dims 1,2,3 are supported");
 			exit(EXIT_FAILURE);
 		};
@@ -159,43 +195,29 @@ namespace q3c1 {
 		return _bfs;
 	};
 	BasisFunc* Vertex::get_bf(const std::vector<DimType> &dim_types) const {
-		if (_no_dims == 1) {
-			if (dim_types[0] == DimType::VAL) {
-				return _bfs[0];
-			} else {
-				return _bfs[1];
-			};
-		} else if (_no_dims == 2) {
-			if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::VAL) {
-				return _bfs[0];
-			} else if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::DERIV) {
-				return _bfs[1];
-			} else if (dim_types[0] == DimType::DERIV && dim_types[1] == DimType::VAL) {
-				return _bfs[2];
-			} else {
-				return _bfs[3];
-			};
-		} else if (_no_dims == 3) {
-			if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::VAL && dim_types[2] == DimType::VAL) {
-				return _bfs[0];
-			} else if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::VAL && dim_types[2] == DimType::DERIV) {
-				return _bfs[1];
-			} else if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::DERIV && dim_types[2] == DimType::VAL) {
-				return _bfs[2];
-			} else if (dim_types[0] == DimType::DERIV && dim_types[1] == DimType::VAL && dim_types[2] == DimType::VAL) {
-				return _bfs[3];
-			} else if (dim_types[0] == DimType::VAL && dim_types[1] == DimType::DERIV && dim_types[2] == DimType::DERIV) {
-				return _bfs[4];
-			} else if (dim_types[0] == DimType::DERIV && dim_types[1] == DimType::VAL && dim_types[2] == DimType::DERIV) {
-				return _bfs[5];
-			} else if (dim_types[0] == DimType::DERIV && dim_types[1] == DimType::DERIV && dim_types[2] == DimType::VAL) {
-				return _bfs[6];
-			} else {
-				return _bfs[7];
-			};		
-		} else {
-			show_error("Vertex","get_bf","only dims 1,2,3 supported");
-			exit(EXIT_FAILURE);
-		};
+        int idx=0;
+        for (auto dim=0; dim<_no_dims; dim++) {
+            if (dim_types[dim] == DimType::DERIV) {
+                idx += pow(2,_no_dims-dim-1);
+                // _no_dims = 1
+                //     VAL: 0
+                //     DERIV: 0 + 2^(1-0-1) = 0 + 2^0 = 1
+                // _no_dims = 2
+                //     VAL VAL: 0
+                //     VAL DERIV: 0 + 2^(2-1-1) = 0 + 2^0 = 1
+                //     DERIV VAL: 2^(2-0-1) + 0 = 2^1 + 0 = 2
+                //     DERIV DERIV: 2^(2-0-1) + 2^(2-1-1) = 2^1 + 2^0 = 3
+                // _no_dims = 3
+                //     VAL VAL VAL: 0
+                //     VAL VAL DERIV: 0 + 0 + 2^(3-2-1) = 0 + 0 + 2^0 = 1
+                //     VAL DERIV VAL: 0 + 2^(3-1-1) + 0 = 0 + 2^1 + 0 = 2
+                //     VAL DERIV DERIV: 0 + 2^(3-1-1) + 2^(3-2-1) = 0 + 2^1 + 2^0 = 3
+                //     DERIV VAL VAL: 2^(3-0-1) + 0 + 0 = 2^2 + 0 + 0 = 4
+                //     DERIV VAL DERIV: 2^(3-0-1) + 0 + 2^(3-2-1) = 2^2 + 0 + 2^0 = 5
+                //     DERIV DERIV VAL: 2^(3-0-1) + 2^(3-1-1) + 0 = 2^2 + 2^1 + 0 = 6
+                //     DERIV DERIV DERIV: 2^(3-0-1) + 2^(3-1-1) + 2^(3-2-1) = 2^2 + 2^1 + 2^0 = 7
+            };
+        };
+        return _bfs[idx];
 	};
 };

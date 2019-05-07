@@ -22,8 +22,8 @@ namespace q3c1 {
 
 	// Constructors
 	Grid::Grid(std::vector<Dimension1D*> dims) {
-		if (dims.size() > 3 || dims.size() < 1) {
-			std::cerr << ">>> Grid::Grid <<< Error: only 1,2,3 dims supported" << std::endl;
+		if (dims.size() > 6 || dims.size() < 1) {
+			std::cerr << ">>> Grid::Grid <<< Error: only 1,2,3,4,5,6 dims supported" << std::endl;
 			exit(EXIT_FAILURE);
 		};
 
@@ -131,130 +131,98 @@ namespace q3c1 {
 		// Collect needed verts
 		IdxSet idxs_vert(_no_dims), idxs_local(_no_dims);
 		std::vector<std::pair<IdxSet,Vertex*>> verts_local;
-
+        
 		// Go through all dims
 		if (_no_dims == 1) {
 
-			// 0
-			idxs_local[0] = 0;
-			idxs_vert[0] = idxs[0];
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+            for (idxs_local[0]=0; idxs_local[0]<=1; idxs_local[0]++) {
+                for (auto dim=0; dim<_no_dims; dim++) {
+                    idxs_vert[dim] = idxs[dim] + idxs_local[dim];
+                };
 
-			// 1
-			idxs_local[0] = 1;
-			idxs_vert[0] = idxs[0]+1;
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-
+                verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+            };
+            
 		} else if (_no_dims == 2) {
 
-			// 0,0
-			idxs_local[0] = 0;
-			idxs_local[1] = 0;
-			idxs_vert[0] = idxs[0];
-			idxs_vert[1] = idxs[1];
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+            for (idxs_local[0]=0; idxs_local[0]<=1; idxs_local[0]++) {
+                for (idxs_local[1]=0; idxs_local[1]<=1; idxs_local[1]++) {
+                    for (auto dim=0; dim<_no_dims; dim++) {
+                        idxs_vert[dim] = idxs[dim] + idxs_local[dim];
+                    };
 
-			// 0,1
-			idxs_local[0] = 0;
-			idxs_local[1] = 1;
-			idxs_vert[0] = idxs[0];
-			idxs_vert[1] = idxs[1]+1;
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-
-			// 1,0
-			idxs_local[0] = 1;
-			idxs_local[1] = 0;
-			idxs_vert[0] = idxs[0]+1;
-			idxs_vert[1] = idxs[1];
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-
-			// 1,1
-			idxs_local[0] = 1;
-			idxs_local[1] = 1;
-			idxs_vert[0] = idxs[0]+1;
-			idxs_vert[1] = idxs[1]+1;
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+                    verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+                };
+            };
 
 		} else if (_no_dims == 3) {
 
-			// 0,0,0
-			idxs_local[0] = 0;
-			idxs_local[1] = 0;
-			idxs_local[2] = 0;
-			idxs_vert[0] = idxs[0];
-			idxs_vert[1] = idxs[1];
-			idxs_vert[2] = idxs[2];
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-
-			// 0,0,1
-			idxs_local[0] = 0;
-			idxs_local[1] = 0;
-			idxs_local[2] = 1;
-			idxs_vert[0] = idxs[0];
-			idxs_vert[1] = idxs[1];
-			idxs_vert[2] = idxs[2]+1;
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-
-			// 0,1,0
-			idxs_local[0] = 0;
-			idxs_local[1] = 1;
-			idxs_local[2] = 0;
-			idxs_vert[0] = idxs[0];
-			idxs_vert[1] = idxs[1]+1;
-			idxs_vert[2] = idxs[2];
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-
-			// 1,0,0
-			idxs_local[0] = 1;
-			idxs_local[1] = 0;
-			idxs_local[2] = 0;
-			idxs_vert[0] = idxs[0]+1;
-			idxs_vert[1] = idxs[1];
-			idxs_vert[2] = idxs[2];
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-
-			// 0,1,1
-			idxs_local[0] = 0;
-			idxs_local[1] = 1;
-			idxs_local[2] = 1;
-			idxs_vert[0] = idxs[0];
-			idxs_vert[1] = idxs[1]+1;
-			idxs_vert[2] = idxs[2]+1;
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-
-			// 1,0,1
-			idxs_local[0] = 1;
-			idxs_local[1] = 0;
-			idxs_local[2] = 1;
-			idxs_vert[0] = idxs[0]+1;
-			idxs_vert[1] = idxs[1];
-			idxs_vert[2] = idxs[2]+1;
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-
-			// 1,1,0
-			idxs_local[0] = 1;
-			idxs_local[1] = 1;
-			idxs_local[2] = 0;
-			idxs_vert[0] = idxs[0]+1;
-			idxs_vert[1] = idxs[1]+1;
-			idxs_vert[2] = idxs[2];
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-
-			// 1,1,1
-			idxs_local[0] = 1;
-			idxs_local[1] = 1;
-			idxs_local[2] = 1;
-			idxs_vert[0] = idxs[0]+1;
-			idxs_vert[1] = idxs[1]+1;
-			idxs_vert[2] = idxs[2]+1;
-			verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
-            
-            /*
-            std::cout << "   Verts:" << std::endl;
-            for (auto i=0; i<8; i++) {
-                std::cout << "   " << verts_local[i].second->get_abscissa(0) << " " << verts_local[i].second->get_abscissa(1) << " " << verts_local[i].second->get_abscissa(2) << std::endl;
+            for (idxs_local[0]=0; idxs_local[0]<=1; idxs_local[0]++) {
+                for (idxs_local[1]=0; idxs_local[1]<=1; idxs_local[1]++) {
+                    for (idxs_local[2]=0; idxs_local[2]<=1; idxs_local[2]++) {
+                        for (auto dim=0; dim<_no_dims; dim++) {
+                            idxs_vert[dim] = idxs[dim] + idxs_local[dim];
+                        };
+                    
+                        verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+                    };
+                };
             };
-             */
+
+        } else if (_no_dims == 4) {
+            
+            for (idxs_local[0]=0; idxs_local[0]<=1; idxs_local[0]++) {
+                for (idxs_local[1]=0; idxs_local[1]<=1; idxs_local[1]++) {
+                    for (idxs_local[2]=0; idxs_local[2]<=1; idxs_local[2]++) {
+                        for (idxs_local[3]=0; idxs_local[3]<=1; idxs_local[3]++) {
+                            for (auto dim=0; dim<_no_dims; dim++) {
+                                idxs_vert[dim] = idxs[dim] + idxs_local[dim];
+                            };
+                        
+                            verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+                        };
+                    };
+                };
+            };
+            
+        } else if (_no_dims == 5) {
+            
+            for (idxs_local[0]=0; idxs_local[0]<=1; idxs_local[0]++) {
+                for (idxs_local[1]=0; idxs_local[1]<=1; idxs_local[1]++) {
+                    for (idxs_local[2]=0; idxs_local[2]<=1; idxs_local[2]++) {
+                        for (idxs_local[3]=0; idxs_local[3]<=1; idxs_local[3]++) {
+                            for (idxs_local[4]=0; idxs_local[4]<=1; idxs_local[4]++) {
+                                for (auto dim=0; dim<_no_dims; dim++) {
+                                    idxs_vert[dim] = idxs[dim] + idxs_local[dim];
+                                };
+                                
+                                verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+                            };
+                        };
+                    };
+                };
+            };
+            
+        } else if (_no_dims == 6) {
+            
+            for (idxs_local[0]=0; idxs_local[0]<=1; idxs_local[0]++) {
+                for (idxs_local[1]=0; idxs_local[1]<=1; idxs_local[1]++) {
+                    for (idxs_local[2]=0; idxs_local[2]<=1; idxs_local[2]++) {
+                        for (idxs_local[3]=0; idxs_local[3]<=1; idxs_local[3]++) {
+                            for (idxs_local[4]=0; idxs_local[4]<=1; idxs_local[4]++) {
+                                for (idxs_local[5]=0; idxs_local[5]<=1; idxs_local[5]++) {
+                                    for (auto dim=0; dim<_no_dims; dim++) {
+                                        idxs_vert[dim] = idxs[dim] + idxs_local[dim];
+                                    };
+                                    
+                                    verts_local.push_back(std::make_pair(idxs_local,_get_or_make_vertex(idxs_vert)));
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+            
         };
 
 		// Make
@@ -272,13 +240,14 @@ namespace q3c1 {
 		};
 	};
 	void Grid::print(Vertex* vert, const std::vector<DimType>& dim_types) const {
-		if (_no_dims == 1) {
-			std::cout << vert->get_abscissa(0) << ": " << std::flush;
-		} else if (_no_dims == 2) {
-			std::cout << vert->get_abscissa(0) << " " << vert->get_abscissa(1) << ": "<< std::flush;
-		} else if (_no_dims == 3) {
-			std::cout << vert->get_abscissa(0) << " " << vert->get_abscissa(1) << " "<< vert->get_abscissa(2) << ": " << std::flush;
-		};
+        for (auto dim=0; dim<_no_dims; dim++) {
+            std::cout << vert->get_abscissa(dim) << std::flush;
+            if (dim != _no_dims-1) {
+                std::cout << " " << std::flush;
+            } else {
+                std::cout << ": " << std::flush;
+            };
+        };
 		std::cout << vert->get_bf(dim_types)->get_coeff() << std::endl;
 	};
 
@@ -412,48 +381,87 @@ namespace q3c1 {
 		std::map<Vertex*,std::vector<double>> ret;
 
 		// Go through all verts of the cell
+        // First are the local idxs; second is the vertex itself
+        std::vector<DimType> dim_types_possible({DimType::VAL,DimType::DERIV});
 		if (_no_dims == 1) {
+            
 			for (auto &pr_v: pr_cell.first->get_all_vertices()) {
-				// First are the local idxs; second is the vertex itself
-				// Val
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second));
-				// Deriv
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second));
+                for (auto const &dim0: dim_types_possible) {
+                    ret[pr_v.second].push_back(pr_v.second->get_bf({dim0})->get_bf_val(pr_v.first,pr_cell.second));
+                };
 			};
+            
 		} else if (_no_dims == 2) {
+            
 			for (auto &pr_v: pr_cell.first->get_all_vertices()) {
-				// First are the local idxs; second is the vertex itself
-				// Val-val
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::VAL,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second));
-				// Val-deriv
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::VAL,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second));
-				// Deriv-val
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::DERIV,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second));
-				// Deriv-deriv
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::DERIV,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second));
-			};
+                for (auto const &dim0: dim_types_possible) {
+                    for (auto const &dim1: dim_types_possible) {
+                        ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1})->get_bf_val(pr_v.first,pr_cell.second));
+                    };
+                };
+            };
+            
 		} else if (_no_dims == 3) {
-			for (auto &pr_v: pr_cell.first->get_all_vertices()) {
-				// First are the local idxs; second is the vertex itself
-				// Val-val-val
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::VAL,DimType::VAL,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second));
-				// Val-val-deriv
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::VAL,DimType::VAL,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second));
-				// Val-deriv-val
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::VAL,DimType::DERIV,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second));
-				// Deriv-val-val
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::DERIV,DimType::VAL,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second));
-				// Val-deriv-deriv
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::VAL,DimType::DERIV,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second));
-				// Deriv-val-deriv
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::DERIV,DimType::VAL,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second));
-				// Deriv-deriv-val
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::DERIV,DimType::DERIV,DimType::VAL})->get_bf_val(pr_v.first,pr_cell.second));
-				// Deriv-deriv-deriv
-				ret[pr_v.second].push_back(pr_v.second->get_bf({DimType::DERIV,DimType::DERIV,DimType::DERIV})->get_bf_val(pr_v.first,pr_cell.second));
-			};
-		};	
+            
+            for (auto &pr_v: pr_cell.first->get_all_vertices()) {
+                for (auto const &dim0: dim_types_possible) {
+                    for (auto const &dim1: dim_types_possible) {
+                        for (auto const &dim2: dim_types_possible) {
+                            ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2})->get_bf_val(pr_v.first,pr_cell.second));
+                        };
+                    };
+                };
+            };
 
+        } else if (_no_dims == 4) {
+            
+            for (auto &pr_v: pr_cell.first->get_all_vertices()) {
+                for (auto const &dim0: dim_types_possible) {
+                    for (auto const &dim1: dim_types_possible) {
+                        for (auto const &dim2: dim_types_possible) {
+                            for (auto const &dim3: dim_types_possible) {
+                                ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3})->get_bf_val(pr_v.first,pr_cell.second));
+                            };
+                        };
+                    };
+                };
+            };
+
+        } else if (_no_dims == 5) {
+            
+            for (auto &pr_v: pr_cell.first->get_all_vertices()) {
+                for (auto const &dim0: dim_types_possible) {
+                    for (auto const &dim1: dim_types_possible) {
+                        for (auto const &dim2: dim_types_possible) {
+                            for (auto const &dim3: dim_types_possible) {
+                                for (auto const &dim4: dim_types_possible) {
+                                ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3,dim4})->get_bf_val(pr_v.first,pr_cell.second));
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+
+        } else if (_no_dims == 6) {
+            
+            for (auto &pr_v: pr_cell.first->get_all_vertices()) {
+                for (auto const &dim0: dim_types_possible) {
+                    for (auto const &dim1: dim_types_possible) {
+                        for (auto const &dim2: dim_types_possible) {
+                            for (auto const &dim3: dim_types_possible) {
+                                for (auto const &dim4: dim_types_possible) {
+                                    for (auto const &dim5: dim_types_possible) {
+                                        ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3,dim4,dim5})->get_bf_val(pr_v.first,pr_cell.second));
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+        
 		return ret;
 	};
 
@@ -484,6 +492,9 @@ namespace q3c1 {
 		std::string ordinate_str="";
 		double ordinate;
 
+        // Possible dims
+        std::vector<DimType> dim_types_possible({DimType::VAL, DimType::DERIV});
+
 		// Read
 		std::string line;
 		std::istringstream iss;
@@ -506,90 +517,89 @@ namespace q3c1 {
 
 			// Ordinate
 			if (_no_dims == 1) {
-				// Val
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::VAL})->set_coeff(ordinate);
-
-				// Deriv
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::DERIV})->set_coeff(ordinate);
+                
+                for (auto const &dim0: dim_types_possible) {
+                    ordinate_str = "";
+                    iss >> ordinate_str;
+                    ordinate = atof(ordinate_str.c_str());
+                    vert->get_bf({dim0})->set_coeff(ordinate);
+                };
+                
 			} else if (_no_dims == 2) {
-				// Val-val
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::VAL,DimType::VAL})->set_coeff(ordinate);
 
-				// Val-deriv
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::VAL,DimType::DERIV})->set_coeff(ordinate);
+                for (auto const &dim0: dim_types_possible) {
+                    for (auto const &dim1: dim_types_possible) {
+                        ordinate_str = "";
+                        iss >> ordinate_str;
+                        ordinate = atof(ordinate_str.c_str());
+                        vert->get_bf({dim0,dim1})->set_coeff(ordinate);
+                    };
+                };
 
-				// Deriv-val
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::DERIV,DimType::VAL})->set_coeff(ordinate);
-
-				// Deriv-deriv
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::DERIV,DimType::DERIV})->set_coeff(ordinate);
-			} else if (_no_dims == 3) {
-				// Val-val-val
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::VAL,DimType::VAL,DimType::VAL})->set_coeff(ordinate);
-
-				// Val-val-deriv
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::VAL,DimType::VAL,DimType::DERIV})->set_coeff(ordinate);
-
-				// Val-deriv-val
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::VAL,DimType::DERIV,DimType::VAL})->set_coeff(ordinate);
-
-				// Deriv-val-val
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::DERIV,DimType::VAL,DimType::VAL})->set_coeff(ordinate);
-
-				// Val-deriv-deriv
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::VAL,DimType::DERIV,DimType::DERIV})->set_coeff(ordinate);
-
-				// Deriv-val-deriv
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::DERIV,DimType::VAL,DimType::DERIV})->set_coeff(ordinate);
-
-				// Deriv-deriv-val
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::DERIV,DimType::DERIV,DimType::VAL})->set_coeff(ordinate);
-
-				// Deriv-deriv-deriv
-				ordinate_str = "";
-				iss >> ordinate_str;
-				ordinate = atof(ordinate_str.c_str());
-				vert->get_bf({DimType::DERIV,DimType::DERIV,DimType::DERIV})->set_coeff(ordinate);
-			};			
+            } else if (_no_dims == 3) {
+                
+                for (auto const &dim0: dim_types_possible) {
+                    for (auto const &dim1: dim_types_possible) {
+                        for (auto const &dim2: dim_types_possible) {
+                            ordinate_str = "";
+                            iss >> ordinate_str;
+                            ordinate = atof(ordinate_str.c_str());
+                            vert->get_bf({dim0,dim1,dim2})->set_coeff(ordinate);
+                        };
+                    };
+                };
+                
+            } else if (_no_dims == 4) {
+                
+                for (auto const &dim0: dim_types_possible) {
+                    for (auto const &dim1: dim_types_possible) {
+                        for (auto const &dim2: dim_types_possible) {
+                            for (auto const &dim3: dim_types_possible) {
+                                ordinate_str = "";
+                                iss >> ordinate_str;
+                                ordinate = atof(ordinate_str.c_str());
+                                vert->get_bf({dim0,dim1,dim2,dim3})->set_coeff(ordinate);
+                            };
+                        };
+                    };
+                };
+                
+            } else if (_no_dims == 5) {
+                
+                for (auto const &dim0: dim_types_possible) {
+                    for (auto const &dim1: dim_types_possible) {
+                        for (auto const &dim2: dim_types_possible) {
+                            for (auto const &dim3: dim_types_possible) {
+                                for (auto const &dim4: dim_types_possible) {
+                                    ordinate_str = "";
+                                    iss >> ordinate_str;
+                                    ordinate = atof(ordinate_str.c_str());
+                                    vert->get_bf({dim0,dim1,dim2,dim3,dim4})->set_coeff(ordinate);
+                                };
+                            };
+                        };
+                    };
+                };
+                
+            } else if (_no_dims == 6) {
+                
+                for (auto const &dim0: dim_types_possible) {
+                    for (auto const &dim1: dim_types_possible) {
+                        for (auto const &dim2: dim_types_possible) {
+                            for (auto const &dim3: dim_types_possible) {
+                                for (auto const &dim4: dim_types_possible) {
+                                    for (auto const &dim5: dim_types_possible) {
+                                        ordinate_str = "";
+                                        iss >> ordinate_str;
+                                        ordinate = atof(ordinate_str.c_str());
+                                        vert->get_bf({dim0,dim1,dim2,dim3,dim4,dim5})->set_coeff(ordinate);
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
 		};
 
 		// Close
@@ -608,6 +618,10 @@ namespace q3c1 {
 			exit(EXIT_FAILURE);
 		};
 
+        // Dims possible
+        std::vector<DimType> dim_types_possible({DimType::VAL, DimType::DERIV});
+        int space_ctr = 0;
+        
 		// Go through all grid pts
 		bool first_line=true;
 		for (auto &vert: _verts) {
@@ -624,38 +638,97 @@ namespace q3c1 {
 			};
 
 			// Write vals for each bf
+            space_ctr = 0;
 			if (_no_dims == 1) {
-				// Val
-				f << vert.second->get_bf({DimType::VAL})->get_coeff() << " ";
-				// Deriv
-				f << vert.second->get_bf({DimType::DERIV})->get_coeff();
-			} else if (_no_dims == 2) {
-				// Val-val
-				f << vert.second->get_bf({DimType::VAL,DimType::VAL})->get_coeff() << " ";
-				// Val-deriv
-				f << vert.second->get_bf({DimType::VAL,DimType::DERIV})->get_coeff() << " ";
-				// Deriv-val
-				f << vert.second->get_bf({DimType::DERIV,DimType::VAL})->get_coeff() << " ";
-				// Deriv-deriv
-				f << vert.second->get_bf({DimType::DERIV,DimType::DERIV})->get_coeff();
-			} else if (_no_dims == 3) {
-				// Val-val-val
-				f << vert.second->get_bf({DimType::VAL,DimType::VAL,DimType::VAL})->get_coeff() << " ";
-				// Val-val-deriv
-				f << vert.second->get_bf({DimType::VAL,DimType::VAL,DimType::DERIV})->get_coeff() << " ";
-				// Val-deriv-val
-				f << vert.second->get_bf({DimType::VAL,DimType::DERIV,DimType::VAL})->get_coeff() << " ";
-				// Deriv-val-val
-				f << vert.second->get_bf({DimType::DERIV,DimType::VAL,DimType::VAL})->get_coeff() << " ";
-				// Val-deriv-deriv
-				f << vert.second->get_bf({DimType::VAL,DimType::DERIV,DimType::DERIV})->get_coeff() << " ";
-				// Deriv-val-deriv
-				f << vert.second->get_bf({DimType::DERIV,DimType::VAL,DimType::DERIV})->get_coeff() << " ";
-				// Deriv-deriv-val
-				f << vert.second->get_bf({DimType::DERIV,DimType::DERIV,DimType::VAL})->get_coeff() << " ";
-				// Deriv-deriv-deriv
-				f << vert.second->get_bf({DimType::DERIV,DimType::DERIV,DimType::DERIV})->get_coeff();
-			};		
+                
+                for (auto dim0: dim_types_possible) {
+                    f << vert.second->get_bf({dim0})->get_coeff();
+                    space_ctr++;
+                    if (space_ctr != pow(2,_no_dims)-1) {
+                        f << " ";
+                    };
+                };
+
+            } else if (_no_dims == 2) {
+                
+                for (auto dim0: dim_types_possible) {
+                    for (auto dim1: dim_types_possible) {
+                        f << vert.second->get_bf({dim0,dim1})->get_coeff();
+                        space_ctr++;
+                        if (space_ctr != pow(2,_no_dims)-1) {
+                            f << " ";
+                        };
+                    };
+                };
+
+            } else if (_no_dims == 3) {
+
+                for (auto dim0: dim_types_possible) {
+                    for (auto dim1: dim_types_possible) {
+                        for (auto dim2: dim_types_possible) {
+                            f << vert.second->get_bf({dim0,dim1,dim2})->get_coeff();
+                            space_ctr++;
+                            if (space_ctr != pow(2,_no_dims)-1) {
+                                f << " ";
+                            };
+                        };
+                    };
+                };
+
+            } else if (_no_dims == 4) {
+                
+                for (auto dim0: dim_types_possible) {
+                    for (auto dim1: dim_types_possible) {
+                        for (auto dim2: dim_types_possible) {
+                            for (auto dim3: dim_types_possible) {
+                                f << vert.second->get_bf({dim0,dim1,dim2,dim3})->get_coeff();
+                                space_ctr++;
+                                if (space_ctr != pow(2,_no_dims)-1) {
+                                    f << " ";
+                                };
+                            };
+                        };
+                    };
+                };
+                
+            } else if (_no_dims == 5) {
+                
+                for (auto dim0: dim_types_possible) {
+                    for (auto dim1: dim_types_possible) {
+                        for (auto dim2: dim_types_possible) {
+                            for (auto dim3: dim_types_possible) {
+                                for (auto dim4: dim_types_possible) {
+                                    f << vert.second->get_bf({dim0,dim1,dim2,dim3,dim4})->get_coeff();
+                                    space_ctr++;
+                                    if (space_ctr != pow(2,_no_dims)-1) {
+                                        f << " ";
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+                
+            } else if (_no_dims == 6) {
+                
+                for (auto dim0: dim_types_possible) {
+                    for (auto dim1: dim_types_possible) {
+                        for (auto dim2: dim_types_possible) {
+                            for (auto dim3: dim_types_possible) {
+                                for (auto dim4: dim_types_possible) {
+                                    for (auto dim5: dim_types_possible) {
+                                        f << vert.second->get_bf({dim0,dim1,dim2,dim3,dim4,dim5})->get_coeff();
+                                        space_ctr++;
+                                        if (space_ctr != pow(2,_no_dims)-1) {
+                                            f << " ";
+                                        };
+                                    };
+                                };
+                            };
+                        };
+                    };
+                };
+            };
 		};
 
 		// Close
