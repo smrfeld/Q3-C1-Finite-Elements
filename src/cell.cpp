@@ -15,11 +15,6 @@ namespace q3c1 {
 
 	// Constructors
 	Cell::Cell(IdxSet idxs, std::vector<std::pair<IdxSet,Vertex*>> verts) : _idxs(idxs) {
-		if (_idxs.size() > 3 || _idxs.size() == 0) {
-			show_error("Cell","Cell","Only dimensions 1,2,3 supported");
-			exit(EXIT_FAILURE);		
-		};
-
 		_no_dims = _idxs.size();
 		_verts = verts;
 	};
