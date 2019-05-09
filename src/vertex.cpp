@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 /************************************
 * Namespace for q3c1
