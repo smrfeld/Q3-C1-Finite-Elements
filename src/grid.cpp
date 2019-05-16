@@ -31,7 +31,6 @@ namespace q3c1 {
 		_no_dims = dims.size();
 		_dims = dims;
         _frac_get_cell = std::vector<double>(_no_dims, 0.0);
-        std::cout << _frac_get_cell.size() << std::endl;
 	};
     Grid::Grid(const Grid& other) : _idxs_get_cell(other._idxs_get_cell) {
 		_copy(other);
