@@ -30,7 +30,8 @@ namespace q3c1 {
 
 		_no_dims = dims.size();
 		_dims = dims;
-        _frac_get_cell= std::vector<double>(_no_dims);
+        _frac_get_cell = std::vector<double>(_no_dims, 0.0);
+        std::cout << _frac_get_cell.size() << std::endl;
 	};
     Grid::Grid(const Grid& other) : _idxs_get_cell(other._idxs_get_cell) {
 		_copy(other);
@@ -309,14 +310,14 @@ namespace q3c1 {
 		};
 	};
 
-	std::pair<Cell*,const std::vector<double>&> Grid::get_cell(const std::vector<double>& abscissas) const {
+	std::pair<Cell*, const std::vector<double>*> Grid::get_cell(const std::vector<double>& abscissas) const {
         // std::cout << "Get cell: " << abscissas[0] << " " << abscissas[1] << " " << abscissas[2] << std::endl;
 		for (auto dim=0; dim<_no_dims; dim++) {
 			_idxs_get_cell[dim] = _dims[dim]->get_idxs_surrounding_pt(abscissas[dim]);
 			_frac_get_cell[dim] = _dims[dim]->get_frac_between(abscissas[dim],_idxs_get_cell[dim]);
 		};
         // std::cout << "Surrounding idxs: " << idxs << std::endl;
-		return std::make_pair(get_cell(_idxs_get_cell),_frac_get_cell);
+		return std::make_pair(get_cell(_idxs_get_cell), &_frac_get_cell);
 	};
 
 	const std::map<IdxSet,Cell*>& Grid::get_all_cells() const {
@@ -330,7 +331,7 @@ namespace q3c1 {
 	double Grid::get_val(const std::vector<double>& abscissas) const {
 
 		// Get cell and fraction of this abscissa in the cell
-		std::pair<Cell*,const std::vector<double>&> pr = get_cell(abscissas);
+		std::pair<Cell*,const std::vector<double>*> pr = get_cell(abscissas);
 
 		double val = 0.0;
 
@@ -338,7 +339,7 @@ namespace q3c1 {
 		for (auto const &v_pr: pr.first->get_all_vertices()) {
 			// Run through all bfs defined on this vertex
 			for (auto const &bf: v_pr.second->get_bfs()) {
-				val += bf->get_coeff() * bf->get_bf_val(v_pr.first, pr.second);
+				val += bf->get_coeff() * bf->get_bf_val(v_pr.first, *pr.second);
 			};
 		};
 
@@ -347,7 +348,7 @@ namespace q3c1 {
 	double Grid::get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) const {
 
 		// Get cell and fraction of this abscissa in the cell
-		std::pair<Cell*,const std::vector<double>&> pr = get_cell(abscissas);
+		std::pair<Cell*,const std::vector<double>*> pr = get_cell(abscissas);
 
 		double val = 0.0;
 
@@ -355,7 +356,7 @@ namespace q3c1 {
 		for (auto const &v_pr: pr.first->get_all_vertices()) {
 			// Run through all bfs defined on this vertex
 			for (auto const &bf: v_pr.second->get_bfs()) {
-				val += bf->get_coeff() * bf->get_bf_deriv(v_pr.first, pr.second, deriv_dim);
+				val += bf->get_coeff() * bf->get_bf_deriv(v_pr.first, *pr.second, deriv_dim);
 			};
 		};
 
@@ -365,7 +366,7 @@ namespace q3c1 {
 	double Grid::get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types) const {
 
 		// Get cell and fraction of this abscissa in the cell
-		std::pair<Cell*,const std::vector<double>&> pr = get_cell(abscissas);
+		std::pair<Cell*,const std::vector<double>*> pr = get_cell(abscissas);
 
 		// Get the vertex
 		Vertex* vert = get_vertex(global_vertex_idxs);
@@ -376,12 +377,12 @@ namespace q3c1 {
 		// Get the basis func
 		BasisFunc* bf = vert->get_bf(dim_types);
 
-		return bf->get_bf_val(idxs_local,pr.second);
+		return bf->get_bf_val(idxs_local,*pr.second);
 	};
 	std::map<Vertex*,std::vector<double>> Grid::get_deriv_wrt_coeffs_for_all_surrounding_verts(const std::vector<double>& abscissas) const {
 
 		// Get cell and fraction of this abscissa in the cell
-		std::pair<Cell*,const std::vector<double>&> pr_cell = get_cell(abscissas);
+		std::pair<Cell*,const std::vector<double>*> pr_cell = get_cell(abscissas);
 
 		// Returned
 		std::map<Vertex*,std::vector<double>> ret;
@@ -393,7 +394,7 @@ namespace q3c1 {
             
 			for (auto &pr_v: pr_cell.first->get_all_vertices()) {
                 for (auto const &dim0: dim_types_possible) {
-                    ret[pr_v.second].push_back(pr_v.second->get_bf({dim0})->get_bf_val(pr_v.first,pr_cell.second));
+                    ret[pr_v.second].push_back(pr_v.second->get_bf({dim0})->get_bf_val(pr_v.first,*pr_cell.second));
                 };
 			};
             
@@ -402,7 +403,7 @@ namespace q3c1 {
 			for (auto &pr_v: pr_cell.first->get_all_vertices()) {
                 for (auto const &dim0: dim_types_possible) {
                     for (auto const &dim1: dim_types_possible) {
-                        ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1})->get_bf_val(pr_v.first,pr_cell.second));
+                        ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1})->get_bf_val(pr_v.first,*pr_cell.second));
                     };
                 };
             };
@@ -413,7 +414,7 @@ namespace q3c1 {
                 for (auto const &dim0: dim_types_possible) {
                     for (auto const &dim1: dim_types_possible) {
                         for (auto const &dim2: dim_types_possible) {
-                            ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2})->get_bf_val(pr_v.first,pr_cell.second));
+                            ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2})->get_bf_val(pr_v.first,*pr_cell.second));
                         };
                     };
                 };
@@ -426,7 +427,7 @@ namespace q3c1 {
                     for (auto const &dim1: dim_types_possible) {
                         for (auto const &dim2: dim_types_possible) {
                             for (auto const &dim3: dim_types_possible) {
-                                ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3})->get_bf_val(pr_v.first,pr_cell.second));
+                                ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3})->get_bf_val(pr_v.first,*pr_cell.second));
                             };
                         };
                     };
@@ -441,7 +442,7 @@ namespace q3c1 {
                         for (auto const &dim2: dim_types_possible) {
                             for (auto const &dim3: dim_types_possible) {
                                 for (auto const &dim4: dim_types_possible) {
-                                ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3,dim4})->get_bf_val(pr_v.first,pr_cell.second));
+                                ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3,dim4})->get_bf_val(pr_v.first,*pr_cell.second));
                                 };
                             };
                         };
@@ -458,7 +459,7 @@ namespace q3c1 {
                             for (auto const &dim3: dim_types_possible) {
                                 for (auto const &dim4: dim_types_possible) {
                                     for (auto const &dim5: dim_types_possible) {
-                                        ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3,dim4,dim5})->get_bf_val(pr_v.first,pr_cell.second));
+                                        ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3,dim4,dim5})->get_bf_val(pr_v.first,*pr_cell.second));
                                     };
                                 };
                             };

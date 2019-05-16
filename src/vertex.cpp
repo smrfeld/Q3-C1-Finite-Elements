@@ -21,6 +21,7 @@ namespace q3c1 {
 
 	// Constructors
 	Vertex::Vertex(IdxSet idxs, std::vector<double> abscissas) : _global_idxs(idxs) {
+        
 		// Check size
 		if (idxs.size() != abscissas.size()) {
 			show_error("Vertex","Vertex","idx size must match abscissa size");

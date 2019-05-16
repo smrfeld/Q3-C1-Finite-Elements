@@ -94,7 +94,7 @@ namespace q3c1 {
 
 		// Will make the cell if needed!
 		Cell* get_cell(const IdxSet& idxs) const;
-		std::pair<Cell*,const std::vector<double>&> get_cell(const std::vector<double>& abscissas) const;
+		std::pair<Cell*,const std::vector<double>*> get_cell(const std::vector<double>& abscissas) const;
 		const std::map<IdxSet,Cell*>& get_all_cells() const;
 
 		/********************
