@@ -46,6 +46,7 @@ namespace q3c1 {
         // Frac point is between cell boundaries (faster for returning ref)
         mutable IdxSet _idxs_get_cell;
         mutable std::vector<double> _frac_get_cell;
+        mutable std::map<int, std::map<DimType, std::map<int, double>>> _vals_get_val;
         
 		// Make a cell/vertex (presumes that the cell does NOT exist!)
 		Vertex* _make_vertex(IdxSet idxs) const;

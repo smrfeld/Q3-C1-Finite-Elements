@@ -31,6 +31,16 @@ namespace q3c1 {
 		_no_dims = dims.size();
 		_dims = dims;
         _frac_get_cell = std::vector<double>(_no_dims, 0.0);
+
+        for (int dim=0; dim<_no_dims; dim++) {
+            _vals_get_val[dim] = std::map<DimType, std::map<int, double>>();
+            _vals_get_val[dim][DimType::VAL] = std::map<int, double>();
+            _vals_get_val[dim][DimType::VAL][0] = 0.0;
+            _vals_get_val[dim][DimType::VAL][1] = 0.0;
+            _vals_get_val[dim][DimType::DERIV] = std::map<int, double>();
+            _vals_get_val[dim][DimType::DERIV][0] = 0.0;
+            _vals_get_val[dim][DimType::DERIV][1] = 0.0;
+        };
 	};
     Grid::Grid(const Grid& other) : _idxs_get_cell(other._idxs_get_cell) {
 		_copy(other);
@@ -88,6 +98,7 @@ namespace q3c1 {
 		};
         _frac_get_cell = other._frac_get_cell;
         _idxs_get_cell = other._idxs_get_cell;
+        _vals_get_val = other._vals_get_val;
 	};
 	void Grid::_move(Grid& other)
 	{
@@ -97,13 +108,15 @@ namespace q3c1 {
 		_cells = other._cells;
         _frac_get_cell = other._frac_get_cell;
         _idxs_get_cell = other._idxs_get_cell;
-
+        _vals_get_val = other._vals_get_val;
+        
 		// Reset other
 		other._no_dims = 0;
 		other._dims.clear();
 		other._verts.clear();
 		other._cells.clear();
         other._frac_get_cell.clear();
+        other._vals_get_val.clear();
 	};
 
 	/********************
@@ -333,7 +346,8 @@ namespace q3c1 {
 		std::pair<Cell*,const std::vector<double>*> pr = get_cell(abscissas);
 
 		double val = 0.0;
-
+        
+        /*
 		// Run through all verts of the cell
 		for (auto const &v_pr: pr.first->get_all_vertices()) {
 			// Run through all bfs defined on this vertex
@@ -341,7 +355,25 @@ namespace q3c1 {
 				val += bf->get_coeff() * bf->get_bf_val(v_pr.first, *pr.second);
 			};
 		};
-
+         */
+        
+        double f;
+        for (int dim=0; dim<_no_dims; dim++) {
+            f = pr.second->at(dim);
+            _vals_get_val[dim][DimType::VAL][0] = 1.0 - 3.0*pow(f,2) + 2.0*pow(f,3);
+            _vals_get_val[dim][DimType::VAL][1] = 3.0*pow(f,2) - 2.0*pow(f,3);
+            _vals_get_val[dim][DimType::DERIV][0] = f - 2.0*pow(f,2) + pow(f,3);
+            _vals_get_val[dim][DimType::DERIV][1] = pow(f,3) - pow(f,2);
+        };
+        
+        // Run through all verts of the cell
+        for (auto const &v_pr: pr.first->get_all_vertices()) {
+            // Run through all bfs defined on this vertex
+            for (auto const &bf: v_pr.second->get_bfs()) {
+                val += bf->get_coeff() * bf->get_bf_val(v_pr.first, _vals_get_val);
+            };
+        };
+        
 		return val;
 	};
 	double Grid::get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) const {
@@ -351,6 +383,7 @@ namespace q3c1 {
 
 		double val = 0.0;
 
+        /*
 		// Run through all verts of the cell
 		for (auto const &v_pr: pr.first->get_all_vertices()) {
 			// Run through all bfs defined on this vertex
@@ -358,9 +391,41 @@ namespace q3c1 {
 				val += bf->get_coeff() * bf->get_bf_deriv(v_pr.first, *pr.second, deriv_dim);
 			};
 		};
+         */
+        
+        double f;
+        for (int dim=0; dim<_no_dims; dim++) {
+            f = pr.second->at(dim);
+            
+            if (dim != deriv_dim) {
+                
+                // NO SPATIAL DERIV
+                
+                _vals_get_val[dim][DimType::VAL][0] = 1.0 - 3.0*pow(f,2) + 2.0*pow(f,3);
+                _vals_get_val[dim][DimType::VAL][1] = 3.0*pow(f,2) - 2.0*pow(f,3);
+                _vals_get_val[dim][DimType::DERIV][0] = f - 2.0*pow(f,2) + pow(f,3);
+                _vals_get_val[dim][DimType::DERIV][1] = pow(f,3) - pow(f,2);
 
+            } else {
+            
+                // SPATIAL DERIV
+
+                _vals_get_val[dim][DimType::VAL][0] = - 6.0*f + 6.0*pow(f,2);
+                _vals_get_val[dim][DimType::VAL][1] = 6.0*f - 6.0*pow(f,2);
+                _vals_get_val[dim][DimType::DERIV][0] = 1.0 - 4.0*f + 3.0*pow(f,2);
+                _vals_get_val[dim][DimType::DERIV][1] = 3.0*pow(f,2) - 2.0*f;
+            };
+        };
+        
+        // Run through all verts of the cell
+        for (auto const &v_pr: pr.first->get_all_vertices()) {
+            // Run through all bfs defined on this vertex
+            for (auto const &bf: v_pr.second->get_bfs()) {
+                val += bf->get_coeff() * bf->get_bf_val(v_pr.first, _vals_get_val);
+            };
+        };
+        
 		return val;
-
 	};
 	double Grid::get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types) const {
 
@@ -386,89 +451,24 @@ namespace q3c1 {
 		// Returned
 		std::map<Vertex*,std::vector<double>> ret;
 
-		// Go through all verts of the cell
-        // First are the local idxs; second is the vertex itself
-        std::vector<DimType> dim_types_possible({DimType::VAL,DimType::DERIV});
-		if (_no_dims == 1) {
-            
-			for (auto &pr_v: pr_cell.first->get_all_vertices()) {
-                for (auto const &dim0: dim_types_possible) {
-                    ret[pr_v.second].push_back(pr_v.second->get_bf({dim0})->get_bf_val(pr_v.first,*pr_cell.second));
-                };
-			};
-            
-		} else if (_no_dims == 2) {
-            
-			for (auto &pr_v: pr_cell.first->get_all_vertices()) {
-                for (auto const &dim0: dim_types_possible) {
-                    for (auto const &dim1: dim_types_possible) {
-                        ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1})->get_bf_val(pr_v.first,*pr_cell.second));
-                    };
-                };
-            };
-            
-		} else if (_no_dims == 3) {
-            
-            for (auto &pr_v: pr_cell.first->get_all_vertices()) {
-                for (auto const &dim0: dim_types_possible) {
-                    for (auto const &dim1: dim_types_possible) {
-                        for (auto const &dim2: dim_types_possible) {
-                            ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2})->get_bf_val(pr_v.first,*pr_cell.second));
-                        };
-                    };
-                };
-            };
-
-        } else if (_no_dims == 4) {
-            
-            for (auto &pr_v: pr_cell.first->get_all_vertices()) {
-                for (auto const &dim0: dim_types_possible) {
-                    for (auto const &dim1: dim_types_possible) {
-                        for (auto const &dim2: dim_types_possible) {
-                            for (auto const &dim3: dim_types_possible) {
-                                ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3})->get_bf_val(pr_v.first,*pr_cell.second));
-                            };
-                        };
-                    };
-                };
-            };
-
-        } else if (_no_dims == 5) {
-            
-            for (auto &pr_v: pr_cell.first->get_all_vertices()) {
-                for (auto const &dim0: dim_types_possible) {
-                    for (auto const &dim1: dim_types_possible) {
-                        for (auto const &dim2: dim_types_possible) {
-                            for (auto const &dim3: dim_types_possible) {
-                                for (auto const &dim4: dim_types_possible) {
-                                ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3,dim4})->get_bf_val(pr_v.first,*pr_cell.second));
-                                };
-                            };
-                        };
-                    };
-                };
-            };
-
-        } else if (_no_dims == 6) {
-            
-            for (auto &pr_v: pr_cell.first->get_all_vertices()) {
-                for (auto const &dim0: dim_types_possible) {
-                    for (auto const &dim1: dim_types_possible) {
-                        for (auto const &dim2: dim_types_possible) {
-                            for (auto const &dim3: dim_types_possible) {
-                                for (auto const &dim4: dim_types_possible) {
-                                    for (auto const &dim5: dim_types_possible) {
-                                        ret[pr_v.second].push_back(pr_v.second->get_bf({dim0,dim1,dim2,dim3,dim4,dim5})->get_bf_val(pr_v.first,*pr_cell.second));
-                                    };
-                                };
-                            };
-                        };
-                    };
-                };
-            };
+        double f;
+        for (int dim=0; dim<_no_dims; dim++) {
+            f = pr_cell.second->at(dim);
+            _vals_get_val[dim][DimType::VAL][0] = 1.0 - 3.0*pow(f,2) + 2.0*pow(f,3);
+            _vals_get_val[dim][DimType::VAL][1] = 3.0*pow(f,2) - 2.0*pow(f,3);
+            _vals_get_val[dim][DimType::DERIV][0] = f - 2.0*pow(f,2) + pow(f,3);
+            _vals_get_val[dim][DimType::DERIV][1] = pow(f,3) - pow(f,2);
         };
         
-		return ret;
+        // Run through all verts of the cell
+        for (auto const &pr_v: pr_cell.first->get_all_vertices()) {
+            // Run through all bfs defined on this vertex
+            for (auto const &bf: pr_v.second->get_bfs()) {
+                ret[pr_v.second].push_back(bf->get_bf_val(pr_v.first,_vals_get_val));
+            };
+        };
+
+        return ret;
 	};
 
 

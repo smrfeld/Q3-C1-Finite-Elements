@@ -175,6 +175,14 @@ namespace q3c1 {
 		return val;
 	};
 
+    double BasisFunc::get_bf_val(const IdxSet& local_idxs, const std::map<int, std::map<DimType, std::map<int, double>>>& vals)  const {
+        double val=1.0;
+        for (auto dim=0; dim<_no_dims; dim++) {
+            val *= vals.at(dim).at(_dim_types.at(dim)).at(local_idxs[dim]);
+        };
+        return val;
+    };
+    
 	double BasisFunc::get_bf_deriv(const IdxSet& local_idxs, const std::vector<double>& x_frac, int deriv_dim) const {
 		double val=1.0;
 		for (auto dim=0; dim<_no_dims; dim++) {
@@ -231,4 +239,14 @@ namespace q3c1 {
 
 		return val;
 	};
+    
+    double BasisFunc::get_bf_deriv(const IdxSet& local_idxs, const std::map<int, std::map<DimType, std::map<int, double>>>& vals) const {
+        double val=1.0;
+        for (auto dim=0; dim<_no_dims; dim++) {
+            val *= vals.at(dim).at(_dim_types.at(dim)).at(local_idxs[dim]);
+        };
+        
+        return val;
+    };
+
 };

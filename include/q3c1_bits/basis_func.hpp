@@ -1,4 +1,5 @@
 #include <vector>
+#include <map>
 
 /************************************
 * Namespace for q3c1
@@ -87,6 +88,9 @@ namespace q3c1 {
 	
 		double get_bf_val(const IdxSet& local_idxs, const std::vector<double>& x_frac) const;
 		double get_bf_deriv(const IdxSet& local_idxs, const std::vector<double>& x_frac, int deriv_dim) const;
+
+        double get_bf_val(const IdxSet& local_idxs, const std::map<int, std::map<DimType, std::map<int, double>>>& vals) const;
+        double get_bf_deriv(const IdxSet& local_idxs, const std::map<int, std::map<DimType, std::map<int, double>>>& vals) const;
 
 	};
 
