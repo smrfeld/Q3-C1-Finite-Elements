@@ -22,7 +22,7 @@ namespace q3c1 {
 	****************************************/
 
 	// Constructors
-	Grid::Grid(std::vector<Dimension1D*> dims) {
+    Grid::Grid(std::vector<Dimension1D*> dims) : _idxs_get_cell(dims.size()) {
 		if (dims.size() > 6 || dims.size() < 1) {
 			std::cerr << ">>> Grid::Grid <<< Error: only 1,2,3,4,5,6 dims supported" << std::endl;
 			exit(EXIT_FAILURE);
@@ -30,11 +30,12 @@ namespace q3c1 {
 
 		_no_dims = dims.size();
 		_dims = dims;
+        _frac_get_cell= std::vector<double>(_no_dims);
 	};
-	Grid::Grid(const Grid& other) {
+    Grid::Grid(const Grid& other) : _idxs_get_cell(other._idxs_get_cell) {
 		_copy(other);
 	};
-	Grid::Grid(Grid&& other) {
+    Grid::Grid(Grid&& other) : _idxs_get_cell(other._idxs_get_cell)  {
 		_move(other);
 	};
     Grid& Grid::operator=(const Grid& other) {
@@ -73,6 +74,7 @@ namespace q3c1 {
 			};
 		};
 		_verts.clear();
+        _frac_get_cell.clear();
 	};
 	void Grid::_copy(const Grid& other)
 	{
@@ -84,6 +86,8 @@ namespace q3c1 {
 		for (auto &c: other._cells) {
 			_cells[c.first] = new Cell(*c.second);
 		};
+        _frac_get_cell = other._frac_get_cell;
+        _idxs_get_cell = other._idxs_get_cell;
 	};
 	void Grid::_move(Grid& other)
 	{
@@ -91,12 +95,15 @@ namespace q3c1 {
 		_dims = other._dims;
 		_verts = other._verts;
 		_cells = other._cells;
+        _frac_get_cell = other._frac_get_cell;
+        _idxs_get_cell = other._idxs_get_cell;
 
 		// Reset other
 		other._no_dims = 0;
 		other._dims.clear();
 		other._verts.clear();
 		other._cells.clear();
+        other._frac_get_cell.clear();
 	};
 
 	/********************
@@ -292,7 +299,7 @@ namespace q3c1 {
 	Get cell
 	********************/
 
-	Cell* Grid::get_cell(IdxSet idxs) const {
+	Cell* Grid::get_cell(const IdxSet& idxs) const {
         // std::cout << "Get cell: " << idxs << std::endl;
 		auto it = _cells.find(idxs);
 		if (it != _cells.end()) {
@@ -302,16 +309,14 @@ namespace q3c1 {
 		};
 	};
 
-	std::pair<Cell*,std::vector<double>> Grid::get_cell(const std::vector<double>& abscissas) const {
+	std::pair<Cell*,const std::vector<double>&> Grid::get_cell(const std::vector<double>& abscissas) const {
         // std::cout << "Get cell: " << abscissas[0] << " " << abscissas[1] << " " << abscissas[2] << std::endl;
-		std::vector<double> frac;
-		IdxSet idxs(_no_dims);
 		for (auto dim=0; dim<_no_dims; dim++) {
-			idxs[dim] = _dims[dim]->get_idxs_surrounding_pt(abscissas[dim]);
-			frac.push_back(_dims[dim]->get_frac_between(abscissas[dim],idxs[dim]));
+			_idxs_get_cell[dim] = _dims[dim]->get_idxs_surrounding_pt(abscissas[dim]);
+			_frac_get_cell[dim] = _dims[dim]->get_frac_between(abscissas[dim],_idxs_get_cell[dim]);
 		};
         // std::cout << "Surrounding idxs: " << idxs << std::endl;
-		return std::make_pair(get_cell(idxs),frac);
+		return std::make_pair(get_cell(_idxs_get_cell),_frac_get_cell);
 	};
 
 	const std::map<IdxSet,Cell*>& Grid::get_all_cells() const {
@@ -325,7 +330,7 @@ namespace q3c1 {
 	double Grid::get_val(const std::vector<double>& abscissas) const {
 
 		// Get cell and fraction of this abscissa in the cell
-		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
+		std::pair<Cell*,const std::vector<double>&> pr = get_cell(abscissas);
 
 		double val = 0.0;
 
@@ -342,7 +347,7 @@ namespace q3c1 {
 	double Grid::get_deriv_wrt_abscissa(const std::vector<double>& abscissas, int deriv_dim) const {
 
 		// Get cell and fraction of this abscissa in the cell
-		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
+		std::pair<Cell*,const std::vector<double>&> pr = get_cell(abscissas);
 
 		double val = 0.0;
 
@@ -360,7 +365,7 @@ namespace q3c1 {
 	double Grid::get_deriv_wrt_coeff(const std::vector<double>& abscissas, const IdxSet& global_vertex_idxs, const std::vector<DimType>& dim_types) const {
 
 		// Get cell and fraction of this abscissa in the cell
-		std::pair<Cell*,std::vector<double>> pr = get_cell(abscissas);
+		std::pair<Cell*,const std::vector<double>&> pr = get_cell(abscissas);
 
 		// Get the vertex
 		Vertex* vert = get_vertex(global_vertex_idxs);
@@ -376,7 +381,7 @@ namespace q3c1 {
 	std::map<Vertex*,std::vector<double>> Grid::get_deriv_wrt_coeffs_for_all_surrounding_verts(const std::vector<double>& abscissas) const {
 
 		// Get cell and fraction of this abscissa in the cell
-		std::pair<Cell*,std::vector<double>> pr_cell = get_cell(abscissas);
+		std::pair<Cell*,const std::vector<double>&> pr_cell = get_cell(abscissas);
 
 		// Returned
 		std::map<Vertex*,std::vector<double>> ret;

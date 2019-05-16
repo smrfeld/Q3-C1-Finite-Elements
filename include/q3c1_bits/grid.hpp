@@ -1,6 +1,11 @@
 #include <vector>
 #include <map>
 
+#ifndef IDX_SET_H
+#define IDX_SET_H
+#include "idx_set.hpp"
+#endif
+
 /************************************
 * Namespace for q3c1
 ************************************/
@@ -9,7 +14,6 @@ namespace q3c1 {
 
 	// Forwards
 	class Dimension1D;
-	class IdxSet;
 	class Vertex;
 	class Cell;
 	enum class DimType: unsigned int;
@@ -39,6 +43,10 @@ namespace q3c1 {
 		// Grids
 		mutable std::map<IdxSet,Cell*> _cells;
 
+        // Frac point is between cell boundaries (faster for returning ref)
+        mutable IdxSet _idxs_get_cell;
+        mutable std::vector<double> _frac_get_cell;
+        
 		// Make a cell/vertex (presumes that the cell does NOT exist!)
 		Vertex* _make_vertex(IdxSet idxs) const;
 		Vertex* _get_or_make_vertex(IdxSet idxs) const;
@@ -85,8 +93,8 @@ namespace q3c1 {
 		********************/
 
 		// Will make the cell if needed!
-		Cell* get_cell(IdxSet idxs) const;
-		std::pair<Cell*,std::vector<double>> get_cell(const std::vector<double>& abscissas) const;
+		Cell* get_cell(const IdxSet& idxs) const;
+		std::pair<Cell*,const std::vector<double>&> get_cell(const std::vector<double>& abscissas) const;
 		const std::map<IdxSet,Cell*>& get_all_cells() const;
 
 		/********************
